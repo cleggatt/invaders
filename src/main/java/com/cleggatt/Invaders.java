@@ -197,42 +197,88 @@ public class Invaders {
         return image;
     }
 
-    public static void main(String[] args) {
+    private static Options options = new Options();
 
-        Options options = new Options();
+    static {
         options.addOption("t", "text", false, "generate invader as text");
         options.addOption("p", "png", false, "generate invader as PNG");
+    }
+
+    static class Params {
+
+        enum Format {
+            Text, Image
+        }
+
+        private Format format;
+        private int numWide;
+        private int numHigh;
+
+        Format getFormat() {
+            return format;
+        }
+
+        int getNumWide() {
+            return numWide;
+        }
+
+        int getNumHigh() {
+            return numHigh;
+        }
+
+        Params(Format format, int numWide, int numHigh) {
+            this.format = format;
+            this.numWide = numWide;
+            this.numHigh = numHigh;
+        }
+    }
+
+    static Params parseParams(String[] args) {
 
         CommandLineParser parser = new BasicParser();
-        CommandLine cmd = null;
+        CommandLine cmd;
         try {
             cmd = parser.parse(options, args);
         } catch (ParseException e) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Invaders", options);
+            return null;
+        }
+
+        if (cmd.getOptions().length != 1) {
+            return null;
+        } else if (cmd.hasOption("t")) {
+            return new Params(Params.Format.Text, 1, 1);
+        } else if (cmd.hasOption("p")) {
+            return new Params(Params.Format.Image, 1, 1);
+        }
+
+        return null;
+    }
+
+    public static void main(String[] args) {
+
+        Params params = parseParams(args);
+        if (params == null) {
+            new HelpFormatter().printHelp("Invaders", options);
             System.exit(1);
         }
 
         final Invaders invader = new Invaders(4, 8, 3);
 
-        if (cmd.getOptions().length != 1) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Invaders", options);
-        } else if (cmd.hasOption("t")) {
-            System.out.println(invader.getTextInvader());
-        } else if (cmd.hasOption("p")) {
-            final BufferedImage image = invader.getImageInvader();
-            final File output = new File("/home/chris/IdeaProjects/invaders/invader.png");
-            try {
-                ImageIO.write(image, "PNG", output);
-                System.out.print(String.format("Saved to %s\n", output.getPath()));
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        } else {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("Invaders", options);
+        switch (params.format) {
+            case Text:
+                System.out.println(invader.getTextInvader());
+                break;
+            case Image:
+                final BufferedImage image = invader.getImageInvader();
+                final File output = new File("/home/chris/IdeaProjects/invaders/invader.png");
+                try {
+                    ImageIO.write(image, "PNG", output);
+                    System.out.print(String.format("Saved to %s\n", output.getPath()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+                break;
         }
     }
 }

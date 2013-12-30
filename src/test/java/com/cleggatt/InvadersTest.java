@@ -154,7 +154,6 @@ public class InvadersTest {
     }
 
     public static class GetImageInvadersTest {
-
         @Test
         public void testInvaderGeneration() {
             // Set up
@@ -189,6 +188,46 @@ public class InvadersTest {
             expected.setRGB(6, 3, Color.GREEN.getRGB());
 
             assertImageEquals(expected, image);
+        }
+    }
+
+    public static class ParseParamsTest {
+        @Test
+        public void invalidParamsShouldReturnNull() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"-x"});
+            // Verify
+            assertNull(params);
+        }
+
+        @Test
+        public void conflictingParamsShouldReturnNull() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--text --png"});
+            // Verify
+            assertNull(params);
+        }
+
+        @Test
+        public void textParamShouldReturnSingleText() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--text"});
+            // Verify
+            assertNotNull(params);
+            assertEquals(params.getFormat(), Invaders.Params.Format.Text);
+            assertEquals(params.getNumWide(), 1);
+            assertEquals(params.getNumWide(), 1);
+        }
+
+        @Test
+        public void pngParamShouldReturnSingleImage() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--png"});
+            // Verify
+            assertNotNull(params);
+            assertEquals(params.getFormat(), Invaders.Params.Format.Image);
+            assertEquals(params.getNumWide(), 1);
+            assertEquals(params.getNumWide(), 1);
         }
     }
 
