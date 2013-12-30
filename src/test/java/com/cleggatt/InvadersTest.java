@@ -95,7 +95,7 @@ public class InvadersTest {
     public static class GetImageInvaderTest {
 
         @Test
-        public void testInvaderGeneration() {
+        public void testSingleInvaderGeneration() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -105,7 +105,7 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final BufferedImage image = invaders.getImageInvader();
+            final BufferedImage image = invaders.getImageInvaders(1, 1);
             // Verify
             final BufferedImage expected = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
             expected.setRGB(1, 0, Color.GREEN.getRGB());
@@ -126,7 +126,7 @@ public class InvadersTest {
             double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
             Mockito.stub(random.nextDouble()).toReturn(value);
             // Exercise
-            final BufferedImage image = invaders.getImageInvader();
+            final BufferedImage image = invaders.getImageInvaders(1, 1);
             // Verify
             final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
             expected.setRGB(2, 0, Color.GREEN.getRGB());
@@ -151,11 +151,9 @@ public class InvadersTest {
 
             assertImageEquals(expected, image);
         }
-    }
 
-    public static class GetImageInvadersTest {
         @Test
-        public void testInvaderGeneration() {
+        public void testTiledInvadersGeneration() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 

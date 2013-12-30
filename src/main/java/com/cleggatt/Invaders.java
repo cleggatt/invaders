@@ -69,6 +69,20 @@ public class Invaders {
         return pixels;
     }
 
+    private interface InvaderCanvas {
+        void drawPixel(int x, int y);
+    }
+
+    private void renderInvader(boolean[][] pixels, InvaderCanvas canvas) {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < (width * 2); x++) {
+                if (pixels[y][x]) {
+                    canvas.drawPixel(x, y);
+                }
+            }
+        }
+    }
+
     private StringBuffer createTextCanvas() {
         // We allocate an extra character for each line to allow for the line feed
         final StringBuffer buffer = new StringBuffer((width * height * 2) + height);
@@ -97,62 +111,10 @@ public class Invaders {
         return buffer.toString();
     }
 
-    private BufferedImage createBufferedImageCanvas() {
-        return new BufferedImage(width * 2, height, BufferedImage.TYPE_INT_ARGB);
-    }
-
-    private BufferedImage getImageInvader(boolean[][] pixels) {
-        final BufferedImage image = createBufferedImageCanvas();
-        renderInvader(pixels, new InvaderCanvas() {
-            @Override
-            public void drawPixel(int x, int y) {
-                image.setRGB(x, y, Color.GREEN.getRGB());
-            }
-        });
-
-        if (scale == 1) {
-            return image;
-        }
-
-        return scaleUsingNearestNeighbour(image);
-    }
-
-    private BufferedImage scaleUsingNearestNeighbour(BufferedImage image) {
-        final int w = image.getWidth();
-        final int h = image.getHeight();
-
-        final AffineTransform at = new AffineTransform();
-        at.scale(scale, scale);
-        final AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-
-        final BufferedImage scaled = scaleOp.filter(image, new BufferedImage(w * scale, h * scale, BufferedImage.TYPE_INT_ARGB));
-        return scaled;
-    }
-
-    private interface InvaderCanvas {
-        void drawPixel(int x, int y);
-    }
-
-    private void renderInvader(boolean[][] pixels, InvaderCanvas canvas) {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < (width * 2); x++) {
-                if (pixels[y][x]) {
-                    canvas.drawPixel(x, y);
-                }
-            }
-        }
-    }
-
     public String getTextInvader() {
         final long value = generateInvader(true);
         final boolean[][] pixels = getPixels(value);
         return getTextInvader(pixels);
-    }
-
-    public BufferedImage getImageInvader() {
-        final long value = generateInvader(true);
-        final boolean[][] pixels = getPixels(value);
-        return getImageInvader(pixels);
     }
 
     private class ImageCanvas implements InvaderCanvas {
@@ -180,6 +142,18 @@ public class Invaders {
         }
     }
 
+    private BufferedImage scaleUsingNearestNeighbour(BufferedImage image) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
+
+        final AffineTransform at = new AffineTransform();
+        at.scale(scale, scale);
+        final AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+
+        final BufferedImage scaled = scaleOp.filter(image, new BufferedImage(w * scale, h * scale, BufferedImage.TYPE_INT_ARGB));
+        return scaled;
+    }
+
     public BufferedImage getImageInvaders(int numWide, int numHigh) {
 
         final BufferedImage image = new BufferedImage(width * 2 * numWide, height * numHigh, BufferedImage.TYPE_INT_ARGB);
@@ -194,7 +168,11 @@ public class Invaders {
             imageCanvas.nextLine();
         }
 
-        return image;
+        if (scale == 1) {
+            return image;
+        }
+
+        return scaleUsingNearestNeighbour(image);
     }
 
     private static Options options = new Options();
@@ -269,7 +247,7 @@ public class Invaders {
                 System.out.println(invader.getTextInvader());
                 break;
             case Image:
-                final BufferedImage image = invader.getImageInvader();
+                final BufferedImage image = invader.getImageInvaders(params.getNumWide(), params.getNumWide());
                 final File output = new File("/home/chris/IdeaProjects/invaders/invader.png");
                 try {
                     ImageIO.write(image, "PNG", output);
