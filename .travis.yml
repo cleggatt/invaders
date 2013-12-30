@@ -1,0 +1,5 @@
+language: java
+jdk: oraclejdk7
+env:
+- TERM=dumb
+script: ./gradlew clean build cobertura coveralls
