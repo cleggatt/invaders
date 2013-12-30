@@ -4,9 +4,11 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.mockito.Mockito;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -42,7 +44,7 @@ public class InvadersTest {
         @Test
         public void testGetPixels() {
             // Set up
-            final Invaders invaders = new Invaders(width, height);
+            final Invaders invaders = new Invaders(width, height, 1);
             // Exercise
             final boolean[][] pixels = invaders.getPixels(invader);
             // Verify
@@ -77,9 +79,14 @@ public class InvadersTest {
         @Test
         public void testGetTextInvader() {
             // Set up
-            final Invaders invaders = new Invaders(width, height);
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+            final Invaders invaders = new Invaders(width, height, 1, random);
+
+            double value = getRandomDoubleToGenerate(invader, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
+
             // Exercise
-            final String textInvader = invaders.getTextInvader(invader);
+            final String textInvader = invaders.getTextInvader();
             // Verify
             assertEquals(expectedTextInvader, textInvader);
         }
@@ -90,9 +97,15 @@ public class InvadersTest {
         @Test
         public void testInvaderGeneration() {
             // Set up
-            final Invaders invaders = new Invaders(2, 2);
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 2, 1, random);
+
+            double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
+
             // Exercise
-            final BufferedImage image = invaders.getImageInvader(0b0110);
+            final BufferedImage image = invaders.getImageInvader();
             // Verify
             final BufferedImage expected = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
             expected.setRGB(1, 0, Color.GREEN.getRGB());
@@ -106,23 +119,31 @@ public class InvadersTest {
         @Test
         public void testScaledInvaderGeneration() {
             // Set up
-            final Invaders invaders = new Invaders(2, 2, 2);
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 2, 2, random);
+
+            double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
             // Exercise
-            final BufferedImage image = invaders.getImageInvader(0b0110);
+            final BufferedImage image = invaders.getImageInvader();
             // Verify
             final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
             expected.setRGB(2, 0, Color.GREEN.getRGB());
             expected.setRGB(3, 0, Color.GREEN.getRGB());
             expected.setRGB(4, 0, Color.GREEN.getRGB());
             expected.setRGB(5, 0, Color.GREEN.getRGB());
+
             expected.setRGB(2, 1, Color.GREEN.getRGB());
             expected.setRGB(3, 1, Color.GREEN.getRGB());
             expected.setRGB(4, 1, Color.GREEN.getRGB());
             expected.setRGB(5, 1, Color.GREEN.getRGB());
+
             expected.setRGB(0, 2, Color.GREEN.getRGB());
             expected.setRGB(1, 2, Color.GREEN.getRGB());
             expected.setRGB(6, 2, Color.GREEN.getRGB());
             expected.setRGB(7, 2, Color.GREEN.getRGB());
+
             expected.setRGB(0, 3, Color.GREEN.getRGB());
             expected.setRGB(1, 3, Color.GREEN.getRGB());
             expected.setRGB(6, 3, Color.GREEN.getRGB());
@@ -130,6 +151,49 @@ public class InvadersTest {
 
             assertImageEquals(expected, image);
         }
+    }
+
+    public static class GetImageInvadersTest {
+
+        @Test
+        public void testInvaderGeneration() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 2, 1, random);
+
+            double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
+            double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
+            double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
+            double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
+            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+
+            // Exercise
+            final BufferedImage image = invaders.getImageInvaders(2, 2);
+            // Verify
+            final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(0, 0, Color.GREEN.getRGB());
+            expected.setRGB(3, 0, Color.GREEN.getRGB());
+
+            expected.setRGB(5, 0, Color.GREEN.getRGB());
+            expected.setRGB(6, 0, Color.GREEN.getRGB());
+
+            expected.setRGB(0, 2, Color.GREEN.getRGB());
+            expected.setRGB(3, 2, Color.GREEN.getRGB());
+            expected.setRGB(1, 3, Color.GREEN.getRGB());
+            expected.setRGB(2, 3, Color.GREEN.getRGB());
+
+            expected.setRGB(5, 2, Color.GREEN.getRGB());
+            expected.setRGB(6, 2, Color.GREEN.getRGB());
+            expected.setRGB(5, 3, Color.GREEN.getRGB());
+            expected.setRGB(6, 3, Color.GREEN.getRGB());
+
+            assertImageEquals(expected, image);
+        }
+    }
+
+    private static double getRandomDoubleToGenerate(long desiredValue, long maxValue ) {
+        return (((double) desiredValue) - 1) / maxValue;
     }
 
     private static void assertImageEquals(BufferedImage expected, BufferedImage actual) {

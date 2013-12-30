@@ -3,6 +3,7 @@ package com.cleggatt;
 import org.apache.commons.cli.*;
 
 import javax.imageio.ImageIO;
+import javax.xml.transform.sax.SAXSource;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -11,10 +12,12 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Random;
 import java.util.jar.Manifest;
 
 public class Invaders {
 
+    private final SecureRandom random;
     private final int width;
     private final int height;
     private final int scale;
@@ -25,7 +28,14 @@ public class Invaders {
         this(width, height, 1);
     }
 
+    // TODO Comment width is doubled!
     public Invaders(int width, int height, int scale) {
+
+        this(width, height, scale, new SecureRandom());
+    }
+
+    Invaders(int width, int height, int scale, SecureRandom random) {
+        this.random = random;
         this.width = width;
         this.height = height;
         this.scale = scale;
@@ -36,10 +46,12 @@ public class Invaders {
         return maxValue;
     }
 
-    long generateInvader() {
-        // TODO Comment secure random to get full spread of longs
-        final SecureRandom random = new SecureRandom();
-        return (long) (random.nextDouble() * maxValue) + 1;
+    long generateInvader(boolean verbose) {
+        final long invader = (long) (random.nextDouble() * maxValue) + 1;
+        if (verbose) {
+            System.out.print(String.format("Invader %d of %d\n", invader, getMaxValue()));
+        }
+        return invader;
     }
 
     boolean[][] getPixels(long value) {
@@ -73,7 +85,7 @@ public class Invaders {
     }
 
     private String getTextInvader(boolean[][] pixels) {
-        final StringBuffer textCanvas = createTextCanvas();
+        final StringBuffer buffer = createTextCanvas();
         renderInvader(pixels, new InvaderCanvas() {
             @Override
             public void drawPixel(int x, int y) {
@@ -81,11 +93,11 @@ public class Invaders {
                 pos = pos + (y * width * 2); // Number of lines down
                 pos = pos + y; // Allow for line feeds
                 pos = pos + x; // Position on line
-                textCanvas.setCharAt(pos, '*');
+                buffer.setCharAt(pos, '*');
             }
         });
 
-        return textCanvas.toString();
+        return buffer.toString();
     }
 
     private BufferedImage createBufferedImageCanvas() {
@@ -93,26 +105,30 @@ public class Invaders {
     }
 
     private BufferedImage getImageInvader(boolean[][] pixels) {
-        final BufferedImage imageCanvas = createBufferedImageCanvas();
+        final BufferedImage image = createBufferedImageCanvas();
         renderInvader(pixels, new InvaderCanvas() {
             @Override
             public void drawPixel(int x, int y) {
-                imageCanvas.setRGB(x, y, Color.GREEN.getRGB());
+                image.setRGB(x, y, Color.GREEN.getRGB());
             }
         });
 
         if (scale == 1) {
-            return imageCanvas;
+            return image;
         }
 
-        final int w = imageCanvas.getWidth();
-        final int h = imageCanvas.getHeight();
+        return scaleUsingNearestNeighbour(image);
+    }
+
+    private BufferedImage scaleUsingNearestNeighbour(BufferedImage image) {
+        final int w = image.getWidth();
+        final int h = image.getHeight();
 
         final AffineTransform at = new AffineTransform();
         at.scale(scale, scale);
         final AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
 
-        final BufferedImage scaled = scaleOp.filter(imageCanvas, new BufferedImage(w * scale, h * scale, BufferedImage.TYPE_INT_ARGB));
+        final BufferedImage scaled = scaleOp.filter(image, new BufferedImage(w * scale, h * scale, BufferedImage.TYPE_INT_ARGB));
         return scaled;
     }
 
@@ -130,14 +146,58 @@ public class Invaders {
         }
     }
 
-    String getTextInvader(long value) {
+    public String getTextInvader() {
+        final long value = generateInvader(true);
         final boolean[][] pixels = getPixels(value);
         return getTextInvader(pixels);
     }
 
-    BufferedImage getImageInvader(long value) {
+    public BufferedImage getImageInvader() {
+        final long value = generateInvader(true);
         final boolean[][] pixels = getPixels(value);
         return getImageInvader(pixels);
+    }
+
+    private class ImageCanvas implements InvaderCanvas {
+
+        private final BufferedImage image;
+        int currentX, currentY;
+
+        private ImageCanvas(BufferedImage image) {
+            this.image = image;
+            currentX = currentY = 0;
+        }
+
+        private void nextInvader() {
+            currentX += (width * 2);
+        }
+
+        private void nextLine() {
+            currentX = 0;
+            currentY += height;
+        }
+
+        @Override
+        public void drawPixel(int x, int y) {
+            image.setRGB(currentX + x, currentY + y, Color.GREEN.getRGB());
+        }
+    }
+
+    BufferedImage getImageInvaders(int numWide, int numHigh) {
+
+        final BufferedImage image = new BufferedImage(width * 2 * numWide, height * numHigh, BufferedImage.TYPE_INT_ARGB);
+        final ImageCanvas imageCanvas = new ImageCanvas(image);
+
+        for (int y = 0; y < numHigh; y++) {
+            for (int x = 0; x < numWide; x++) {
+                final long value = generateInvader(false);
+                renderInvader(getPixels(value), imageCanvas);
+                imageCanvas.nextInvader();
+            }
+            imageCanvas.nextLine();
+        }
+
+        return image;
     }
 
     public static void main(String[] args) {
@@ -157,20 +217,17 @@ public class Invaders {
         }
 
         final Invaders invader = new Invaders(4, 8, 3);
-        final long value = invader.generateInvader();
 
         if (cmd.getOptions().length != 1) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("Invaders", options);
         } else if (cmd.hasOption("t")) {
-            System.out.print(String.format("Invader %d of %d\n", value, invader.getMaxValue()));
-            System.out.println(invader.getTextInvader(value));
+            System.out.println(invader.getTextInvader());
         } else if (cmd.hasOption("p")) {
-            final BufferedImage image = invader.getImageInvader(value);
+            final BufferedImage image = invader.getImageInvader();
+            final File output = new File("/home/chris/IdeaProjects/invaders/invader.png");
             try {
-                final File output = new File("/home/chris/IdeaProjects/invaders/invader.png");
                 ImageIO.write(image, "PNG", output);
-                System.out.print(String.format("Invader %d of %d\n", value, invader.getMaxValue()));
                 System.out.print(String.format("Saved to %s\n", output.getPath()));
             } catch (IOException e) {
                 e.printStackTrace();
