@@ -3,7 +3,6 @@ package com.cleggatt;
 import org.apache.commons.cli.*;
 
 import javax.imageio.ImageIO;
-import javax.xml.transform.sax.SAXSource;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -12,8 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.Random;
-import java.util.jar.Manifest;
 
 public class Invaders {
 
@@ -30,7 +27,7 @@ public class Invaders {
 
     // TODO Comment width is doubled!
     public Invaders(int width, int height, int scale) {
-
+        // We use SecureRandom to ensure we get the full range of long values (which won't be returned by Random)
         this(width, height, scale, new SecureRandom());
     }
 
@@ -46,7 +43,7 @@ public class Invaders {
         return maxValue;
     }
 
-    long generateInvader(boolean verbose) {
+    private long generateInvader(boolean verbose) {
         final long invader = (long) (random.nextDouble() * maxValue) + 1;
         if (verbose) {
             System.out.print(String.format("Invader %d of %d\n", invader, getMaxValue()));
@@ -183,7 +180,7 @@ public class Invaders {
         }
     }
 
-    BufferedImage getImageInvaders(int numWide, int numHigh) {
+    public BufferedImage getImageInvaders(int numWide, int numHigh) {
 
         final BufferedImage image = new BufferedImage(width * 2 * numWide, height * numHigh, BufferedImage.TYPE_INT_ARGB);
         final ImageCanvas imageCanvas = new ImageCanvas(image);
