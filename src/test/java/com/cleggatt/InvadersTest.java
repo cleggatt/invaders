@@ -1,17 +1,16 @@
 package com.cleggatt;
 
-import static org.junit.Assert.*;
-
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.*;
 
 @RunWith(Enclosed.class)
 public class InvadersTest {
@@ -41,7 +40,7 @@ public class InvadersTest {
         }
 
         @Test
-        public void testInvaderGeneration() {
+        public void testGetPixels() {
             // Set up
             final Invaders invaders = new Invaders(width, height);
             // Exercise
@@ -76,13 +75,72 @@ public class InvadersTest {
         }
 
         @Test
-        public void testInvaderGeneration() {
+        public void testGetTextInvader() {
             // Set up
             final Invaders invaders = new Invaders(width, height);
             // Exercise
-            String textInvader = invaders.getTextInvader(invader);
+            final String textInvader = invaders.getTextInvader(invader);
             // Verify
             assertEquals(expectedTextInvader, textInvader);
+        }
+    }
+
+    public static class GetImageInvaderTest {
+
+        @Test
+        public void testInvaderGeneration() {
+            // Set up
+            final Invaders invaders = new Invaders(2, 2);
+            // Exercise
+            final BufferedImage image = invaders.getImageInvader(0b0110);
+            // Verify
+            final BufferedImage expected = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(1, 0, Color.GREEN.getRGB());
+            expected.setRGB(2, 0, Color.GREEN.getRGB());
+            expected.setRGB(0, 1, Color.GREEN.getRGB());
+            expected.setRGB(3, 1, Color.GREEN.getRGB());
+
+            assertImageEquals(expected, image);
+        }
+
+        @Test
+        public void testScaledInvaderGeneration() {
+            // Set up
+            final Invaders invaders = new Invaders(2, 2, 2);
+            // Exercise
+            final BufferedImage image = invaders.getImageInvader(0b0110);
+            // Verify
+            final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(2, 0, Color.GREEN.getRGB());
+            expected.setRGB(3, 0, Color.GREEN.getRGB());
+            expected.setRGB(4, 0, Color.GREEN.getRGB());
+            expected.setRGB(5, 0, Color.GREEN.getRGB());
+            expected.setRGB(2, 1, Color.GREEN.getRGB());
+            expected.setRGB(3, 1, Color.GREEN.getRGB());
+            expected.setRGB(4, 1, Color.GREEN.getRGB());
+            expected.setRGB(5, 1, Color.GREEN.getRGB());
+            expected.setRGB(0, 2, Color.GREEN.getRGB());
+            expected.setRGB(1, 2, Color.GREEN.getRGB());
+            expected.setRGB(6, 2, Color.GREEN.getRGB());
+            expected.setRGB(7, 2, Color.GREEN.getRGB());
+            expected.setRGB(0, 3, Color.GREEN.getRGB());
+            expected.setRGB(1, 3, Color.GREEN.getRGB());
+            expected.setRGB(6, 3, Color.GREEN.getRGB());
+            expected.setRGB(7, 3, Color.GREEN.getRGB());
+
+            assertImageEquals(expected, image);
+        }
+    }
+
+    private static void assertImageEquals(BufferedImage expected, BufferedImage actual) {
+        assertEquals("image width", expected.getWidth(), actual.getWidth());
+        assertEquals("image height", expected.getHeight(), actual.getHeight());
+        for (int x = 0; x < expected.getWidth(); x++) {
+            for (int y = 0; y < expected.getHeight(); y++) {
+                if (expected.getRGB(x, y) != actual.getRGB(x, y)) {
+                    fail(String.format("Images not equal at (%d,%d). Expected %d, actual %d", x, y, expected.getRGB(x, y), actual.getRGB(x, y)));
+                }
+            }
         }
     }
 }
