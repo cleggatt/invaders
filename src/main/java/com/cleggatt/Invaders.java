@@ -180,6 +180,8 @@ public class Invaders {
     static {
         options.addOption("t", "text", false, "generate invader as text");
         options.addOption("p", "png", false, "generate invader as PNG");
+        options.addOption("w", "width", true, "number of tiles wide (PNG only)");
+        options.addOption("h", "height", true, "number of tiles high (PNG only)");
     }
 
     static class Params {
@@ -221,12 +223,27 @@ public class Invaders {
             return null;
         }
 
-        if (cmd.getOptions().length != 1) {
-            return null;
-        } else if (cmd.hasOption("t")) {
+        if (cmd.hasOption("t")) {
+            if (cmd.getOptions().length != 1) {
+                return null;
+            }
             return new Params(Params.Format.Text, 1, 1);
         } else if (cmd.hasOption("p")) {
-            return new Params(Params.Format.Image, 1, 1);
+
+            if ((cmd.hasOption("w") && !cmd.hasOption("h")) || (!cmd.hasOption("w") && cmd.hasOption("h"))) {
+                return null;
+            }
+
+            int width = 0;
+            int height = 0;
+            try {
+                width = Integer.parseInt(cmd.getOptionValue('w', "1"));
+                height = Integer.parseInt(cmd.getOptionValue('h', "1"));
+            } catch (NumberFormatException e) {
+                return null;
+            }
+
+            return new Params(Params.Format.Image, width, height);
         }
 
         return null;

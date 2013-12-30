@@ -191,22 +191,6 @@ public class InvadersTest {
 
     public static class ParseParamsTest {
         @Test
-        public void invalidParamsShouldReturnNull() {
-            // Exercise
-            final Invaders.Params params = Invaders.parseParams(new String[]{"-x"});
-            // Verify
-            assertNull(params);
-        }
-
-        @Test
-        public void conflictingParamsShouldReturnNull() {
-            // Exercise
-            final Invaders.Params params = Invaders.parseParams(new String[]{"--text --png"});
-            // Verify
-            assertNull(params);
-        }
-
-        @Test
         public void textParamShouldReturnSingleText() {
             // Exercise
             final Invaders.Params params = Invaders.parseParams(new String[]{"--text"});
@@ -214,7 +198,7 @@ public class InvadersTest {
             assertNotNull(params);
             assertEquals(params.getFormat(), Invaders.Params.Format.Text);
             assertEquals(params.getNumWide(), 1);
-            assertEquals(params.getNumWide(), 1);
+            assertEquals(params.getNumHigh(), 1);
         }
 
         @Test
@@ -225,7 +209,51 @@ public class InvadersTest {
             assertNotNull(params);
             assertEquals(params.getFormat(), Invaders.Params.Format.Image);
             assertEquals(params.getNumWide(), 1);
-            assertEquals(params.getNumWide(), 1);
+            assertEquals(params.getNumHigh(), 1);
+        }
+
+        @Test
+        public void pngWithWidthAndHeightParamShouldReturnTiledImage() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--png", "--width",  "4", "--height", "5"});
+            // Verify
+            assertNotNull(params);
+            assertEquals(params.getFormat(), Invaders.Params.Format.Image);
+            assertEquals(params.getNumWide(), 4);
+            assertEquals(params.getNumHigh(), 5);
+        }
+    }
+
+    @RunWith(Parameterized.class)
+    public static class ParseInvalidParamsTest {
+
+        private final String[] args;
+
+        public ParseInvalidParamsTest(String[] args) {
+            this.args = args;
+        }
+
+        @Parameterized.Parameters
+        public static Collection primeNumbers() {
+            return Arrays.asList(new Object[][]{
+                    {new String[]{"-x"}},
+                    {new String[]{"--text", "--png"}},
+                    {new String[]{"--text", "--width", "5"}},
+                    {new String[]{"--text", "--height", "5"}},
+                    {new String[]{"--text", "--width", "5", "--height", "5"}},
+                    {new String[]{"--png", "--width", "5"}},
+                    {new String[]{"--png", "--height", "5"}},
+                    {new String[]{"--png", "--width", "X", "--height", "5"}},
+                    {new String[]{"--png", "--width", "5", "--height", "X"}},
+            });
+        }
+
+        @Test
+        public void testParseInvalidParams() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(this.args);
+            // Verify
+            assertNull(params);
         }
     }
 
