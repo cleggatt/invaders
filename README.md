@@ -1,0 +1,2 @@
+Invaders [![Build Status](https://secure.travis-ci.org/cleggatt/invaders.png)](http://travis-ci.org/cleggatt/invaders) [![Coverage Status](https://coveralls.io/repos/cleggatt/invaders/badge.png?branch=master)](https://coveralls.io/r/cleggatt/invaders?branch=master)
+========
