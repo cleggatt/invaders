@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Enclosed.class)
 public class InvadersTest {
@@ -35,6 +36,7 @@ public class InvadersTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
+                    // TODO Add some non-square test cases
                     {1, 1, (long) 0b1, new boolean[][]{{true, true}}},
                     {2, 1, (long) 0b10, new boolean[][]{{false, true, true, false}}},
                     {2, 2, (long) 0b0110, new boolean[][]{{false, true, true, false}, {true, false, false, true}}}
@@ -70,6 +72,7 @@ public class InvadersTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
+                    // TODO Add some non-square test cases
                     {1, 1, (long) 0b1, "**\n"},
                     {2, 1, (long) 0b10, " ** \n"},
                     {2, 2, (long) 0b0110, " ** \n*  *\n"}
@@ -92,9 +95,27 @@ public class InvadersTest {
         }
     }
 
-    public static class GetImageInvaderTest {
-
+    public static class ScaledTextInvaderTest {
         @Test
+        // TODO Add a non-square test cases
+        public void testGetTextInvader() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+            final Invaders invaders = new Invaders(2, 2, 2, random);
+
+            double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
+
+            // Exercise
+            final String textInvader = invaders.getTextInvader();
+            // Verify
+            assertEquals("  ****  \n  ****  \n**    **\n**    **\n", textInvader);
+        }
+    }
+
+    public static class GetImageInvaderTest {
+        @Test
+        // TODO Add a non-square test cases
         public void testSingleInvaderGeneration() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
@@ -117,6 +138,7 @@ public class InvadersTest {
         }
 
         @Test
+        // TODO Add a non-square test cases
         public void testScaledInvaderGeneration() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
@@ -196,9 +218,21 @@ public class InvadersTest {
             final Invaders.Params params = Invaders.parseParams(new String[]{"--text"});
             // Verify
             assertNotNull(params);
-            assertEquals(params.getFormat(), Invaders.Params.Format.Text);
-            assertEquals(params.getNumWide(), 1);
-            assertEquals(params.getNumHigh(), 1);
+            assertEquals(Invaders.Params.Format.Text, params.getFormat());
+            assertEquals(1, params.getNumWide());
+            assertEquals(1, params.getNumHigh());
+        }
+
+        @Test
+        public void textParamwithScaleShouldReturnScaledText() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--text", "--scale", "3"});
+            // Verify
+            assertNotNull(params);
+            assertEquals(Invaders.Params.Format.Text, params.getFormat());
+            assertEquals(3,params.getScale());
+            assertEquals(1,params.getNumWide());
+            assertEquals(1,params.getNumHigh());
         }
 
         @Test
@@ -207,9 +241,22 @@ public class InvadersTest {
             final Invaders.Params params = Invaders.parseParams(new String[]{"--png"});
             // Verify
             assertNotNull(params);
-            assertEquals(params.getFormat(), Invaders.Params.Format.Image);
-            assertEquals(params.getNumWide(), 1);
-            assertEquals(params.getNumHigh(), 1);
+            assertEquals(Invaders.Params.Format.Image, params.getFormat());
+            assertEquals(1,params.getScale(), 1);
+            assertEquals(1,params.getNumWide(), 1);
+            assertEquals(1,params.getNumHigh(), 1);
+        }
+
+        @Test
+        public void pngParamShouldReturnScaledImage() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--png", "--scale", "3"});
+            // Verify
+            assertNotNull(params);
+            assertEquals(Invaders.Params.Format.Image, params.getFormat());
+            assertEquals(3, params.getScale());
+            assertEquals(1, params.getNumWide());
+            assertEquals(1, params.getNumHigh());
         }
 
         @Test
@@ -218,9 +265,9 @@ public class InvadersTest {
             final Invaders.Params params = Invaders.parseParams(new String[]{"--png", "--width",  "4", "--height", "5"});
             // Verify
             assertNotNull(params);
-            assertEquals(params.getFormat(), Invaders.Params.Format.Image);
-            assertEquals(params.getNumWide(), 4);
-            assertEquals(params.getNumHigh(), 5);
+            assertEquals(Invaders.Params.Format.Image, params.getFormat());
+            assertEquals(4, params.getNumWide());
+            assertEquals(5, params.getNumHigh());
         }
     }
 
@@ -237,6 +284,10 @@ public class InvadersTest {
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
                     {new String[]{"-x"}},
+                    {new String[]{"--scale"}},
+                    {new String[]{"--width"}},
+                    {new String[]{"--height"}},
+                    {new String[]{"--text", "--scale", "X"}},
                     {new String[]{"--text", "--png"}},
                     {new String[]{"--text", "--width", "5"}},
                     {new String[]{"--text", "--height", "5"}},
@@ -245,6 +296,7 @@ public class InvadersTest {
                     {new String[]{"--png", "--height", "5"}},
                     {new String[]{"--png", "--width", "X", "--height", "5"}},
                     {new String[]{"--png", "--width", "5", "--height", "X"}},
+                    {new String[]{"--png", "--scale", "X"}},
             });
         }
 
