@@ -36,10 +36,10 @@ public class InvadersTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
-                    // TODO Add some non-square test cases
                     {1, 1, (long) 0b1, new boolean[][]{{true, true}}},
                     {2, 1, (long) 0b10, new boolean[][]{{false, true, true, false}}},
-                    {2, 2, (long) 0b0110, new boolean[][]{{false, true, true, false}, {true, false, false, true}}}
+                    {2, 2, (long) 0b0110, new boolean[][]{{false, true, true, false}, {true, false, false, true}}},
+                    {2, 3, (long) 0b100110, new boolean[][]{{false, true, true, false}, {true, false, false, true}, {false, true, true, false}}}
             });
         }
 
@@ -72,10 +72,10 @@ public class InvadersTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
-                    // TODO Add some non-square test cases
                     {1, 1, (long) 0b1, "**\n"},
                     {2, 1, (long) 0b10, " ** \n"},
-                    {2, 2, (long) 0b0110, " ** \n*  *\n"}
+                    {2, 2, (long) 0b0110, " ** \n*  *\n"},
+                    {2, 3, (long) 0b100110, " ** \n*  *\n ** \n"}
             });
         }
 
@@ -97,8 +97,7 @@ public class InvadersTest {
 
     public static class ScaledTextInvaderTest {
         @Test
-        // TODO Add a non-square test cases
-        public void testGetTextInvader() {
+        public void testGetSquareTextInvader() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
             final Invaders invaders = new Invaders(2, 2, 2, random);
@@ -108,15 +107,31 @@ public class InvadersTest {
 
             // Exercise
             final String textInvader = invaders.getTextInvader();
+
             // Verify
             assertEquals("  ****  \n  ****  \n**    **\n**    **\n", textInvader);
+        }
+
+        @Test
+        public void testGetNonSquareTextInvader() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+            final Invaders invaders = new Invaders(2, 3, 2, random);
+
+            double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
+
+            // Exercise
+            final String textInvader = invaders.getTextInvader();
+
+            // Verify
+            assertEquals("  ****  \n  ****  \n**    **\n**    **\n  ****  \n  ****  \n", textInvader);
         }
     }
 
     public static class GetImageInvaderTest {
         @Test
-        // TODO Add a non-square test cases
-        public void testSingleInvaderGeneration() {
+        public void testSingleSquareInvaderGeneration() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -127,6 +142,7 @@ public class InvadersTest {
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(1, 1);
+
             // Verify
             final BufferedImage expected = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
             expected.setRGB(1, 0, Color.GREEN.getRGB());
@@ -138,8 +154,32 @@ public class InvadersTest {
         }
 
         @Test
-        // TODO Add a non-square test cases
-        public void testScaledInvaderGeneration() {
+        public void testSingleNonSquareInvaderGeneration() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 3, 1, random);
+
+            double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
+
+            // Exercise
+            final BufferedImage image = invaders.getImageInvaders(1, 1);
+
+            // Verify
+            final BufferedImage expected = new BufferedImage(4, 3, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(1, 0, Color.GREEN.getRGB());
+            expected.setRGB(2, 0, Color.GREEN.getRGB());
+            expected.setRGB(0, 1, Color.GREEN.getRGB());
+            expected.setRGB(3, 1, Color.GREEN.getRGB());
+            expected.setRGB(1, 2, Color.GREEN.getRGB());
+            expected.setRGB(2, 2, Color.GREEN.getRGB());
+
+            assertImageEquals(expected, image);
+        }
+
+        @Test
+        public void testScaledSquareInvaderGeneration() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -170,6 +210,54 @@ public class InvadersTest {
             expected.setRGB(1, 3, Color.GREEN.getRGB());
             expected.setRGB(6, 3, Color.GREEN.getRGB());
             expected.setRGB(7, 3, Color.GREEN.getRGB());
+
+            assertImageEquals(expected, image);
+        }
+
+        @Test
+        public void testScaledNonSquareInvaderGeneration() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 3, 2, random);
+
+            double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
+            Mockito.stub(random.nextDouble()).toReturn(value);
+
+            // Exercise
+            final BufferedImage image = invaders.getImageInvaders(1, 1);
+
+            // Verify
+            final BufferedImage expected = new BufferedImage(8, 6, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(2, 0, Color.GREEN.getRGB());
+            expected.setRGB(3, 0, Color.GREEN.getRGB());
+            expected.setRGB(4, 0, Color.GREEN.getRGB());
+            expected.setRGB(5, 0, Color.GREEN.getRGB());
+
+            expected.setRGB(2, 1, Color.GREEN.getRGB());
+            expected.setRGB(3, 1, Color.GREEN.getRGB());
+            expected.setRGB(4, 1, Color.GREEN.getRGB());
+            expected.setRGB(5, 1, Color.GREEN.getRGB());
+
+            expected.setRGB(0, 2, Color.GREEN.getRGB());
+            expected.setRGB(1, 2, Color.GREEN.getRGB());
+            expected.setRGB(6, 2, Color.GREEN.getRGB());
+            expected.setRGB(7, 2, Color.GREEN.getRGB());
+
+            expected.setRGB(0, 3, Color.GREEN.getRGB());
+            expected.setRGB(1, 3, Color.GREEN.getRGB());
+            expected.setRGB(6, 3, Color.GREEN.getRGB());
+            expected.setRGB(7, 3, Color.GREEN.getRGB());
+
+            expected.setRGB(2, 4, Color.GREEN.getRGB());
+            expected.setRGB(3, 4, Color.GREEN.getRGB());
+            expected.setRGB(4, 4, Color.GREEN.getRGB());
+            expected.setRGB(5, 4, Color.GREEN.getRGB());
+
+            expected.setRGB(2, 5, Color.GREEN.getRGB());
+            expected.setRGB(3, 5, Color.GREEN.getRGB());
+            expected.setRGB(4, 5, Color.GREEN.getRGB());
+            expected.setRGB(5, 5, Color.GREEN.getRGB());
 
             assertImageEquals(expected, image);
         }
