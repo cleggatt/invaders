@@ -69,8 +69,19 @@ public class Invaders {
         return pixels;
     }
 
-    private interface InvaderCanvas {
+    private interface InvaderCanvas<T> {
         void drawPixel(int x, int y);
+        void nextInvader();
+        void nextLine();
+        T getInvader();
+    }
+
+    private void drawScaledPixel(final int x, final int y, InvaderCanvas canvas) {
+        for (int scaledY = (y * scale); scaledY < ((y * scale)) + scale; scaledY++) {
+            for (int scaledX = (x * scale); scaledX < ((x * scale)) + scale; scaledX++) {
+                canvas.drawPixel(scaledX, scaledY);
+            }
+        }
     }
 
     private void renderInvader(boolean[][] pixels, InvaderCanvas canvas) {
@@ -83,68 +94,98 @@ public class Invaders {
         }
     }
 
-    private void drawScaledPixel(final int x, final int y, InvaderCanvas canvas) {
-        for (int scaledY = (y * scale); scaledY < ((y * scale)) + scale; scaledY++) {
-            for (int scaledX = (x * scale); scaledX < ((x * scale)) + scale; scaledX++) {
-                canvas.drawPixel(scaledX, scaledY);
+    private <T> T getInvaders(int numWide, int numHigh, InvaderCanvas<T> invaderCanvas) {
+
+        for (int y = 0; y < numHigh; y++) {
+            for (int x = 0; x < numWide; x++) {
+                final long value = generateInvader(false);
+                renderInvader(getPixels(value), invaderCanvas);
+                invaderCanvas.nextInvader();
             }
+            invaderCanvas.nextLine();
         }
+
+        return invaderCanvas.getInvader();
     }
 
-    private StringBuffer createTextCanvas() {
-        final int scaledHeight = height * scale;
-        final int scaledWidth = width * scale;
+    private static class TextCanvas implements InvaderCanvas<String> {
 
-        // We allocate an extra character for each line to allow for the line feed
-        final StringBuffer buffer = new StringBuffer((scaledWidth * scaledHeight * 2) + scaledHeight);
-        for (int y = 0; y < scaledHeight; y++) {
-            for (int x = 0; x < (scaledWidth * 2); x++) {
-                buffer.append(' ');
-            }
-            buffer.append('\n');
+        private final int scaledWidth;
+        private final StringBuffer buffer;
+
+        private TextCanvas(int width, int height, int scale) {
+            scaledWidth = width * scale;
+            buffer = createBuffer(height, scale);
         }
-        return buffer;
-    }
 
-    private String getTextInvader(boolean[][] pixels) {
-        final int scaledWidth = width * scale;
+        private StringBuffer createBuffer(final int height, final int scale) {
+            final int scaledHeight = height * scale;
 
-        final StringBuffer buffer = createTextCanvas();
-        renderInvader(pixels, new InvaderCanvas() {
-            @Override
-            public void drawPixel(int x, int y) {
-                int pos = 0;
-                pos = pos + (y * scaledWidth * 2); // Number of lines down
-                pos = pos + y; // Allow for line feeds
-                pos = pos + x; // Position on line
-                buffer.setCharAt(pos, '*');
+            // We allocate an extra character for each line to allow for the line feed
+            final StringBuffer buffer = new StringBuffer((scaledWidth * scaledHeight * 2) + scaledHeight);
+            for (int y = 0; y < scaledHeight; y++) {
+                for (int x = 0; x < (scaledWidth * 2); x++) {
+                    buffer.append(' ');
+                }
+                buffer.append('\n');
             }
-        });
+            return buffer;
+        }
 
-        return buffer.toString();
+        @Override
+        public void drawPixel(int x, int y) {
+            int pos = 0;
+            pos = pos + (y * scaledWidth * 2); // Number of lines down
+            pos = pos + y; // Allow for line feeds
+            pos = pos + x; // Position on line
+            buffer.setCharAt(pos, '*');
+        }
+
+        @Override
+        public void nextInvader() {
+        }
+
+        @Override
+        public void nextLine() {
+        }
+
+        @Override
+        public String getInvader() {
+            return buffer.toString();
+        }
     }
 
     public String getTextInvader() {
         final long value = generateInvader(true);
         final boolean[][] pixels = getPixels(value);
-        return getTextInvader(pixels);
+
+        return getInvaders(1, 1, new TextCanvas(width, height, scale));
     }
 
-    private class ImageCanvas implements InvaderCanvas {
+    private class ImageCanvas implements InvaderCanvas<BufferedImage> {
 
         private final BufferedImage image;
-        int currentX, currentY;
+        private final int width;
+        private final int height;
 
-        private ImageCanvas(BufferedImage image) {
-            this.image = image;
+        private int currentX, currentY;
+
+        private ImageCanvas(int width, int height, int numWide, int numHigh, int scale) {
+            this.width = width;
+            this.height = height;
+
+            image = new BufferedImage(width * 2 * numWide * scale, height * numHigh * scale, BufferedImage.TYPE_INT_ARGB);
+
             currentX = currentY = 0;
         }
 
-        private void nextInvader() {
+        @Override
+        public void nextInvader() {
             currentX += (width * 2);
         }
 
-        private void nextLine() {
+        @Override
+        public void nextLine() {
             currentX = 0;
             currentY += height;
         }
@@ -153,23 +194,15 @@ public class Invaders {
         public void drawPixel(int x, int y) {
             image.setRGB(currentX + x, currentY + y, Color.GREEN.getRGB());
         }
+
+        @Override
+        public BufferedImage getInvader() {
+            return image;
+        }
     }
 
     public BufferedImage getImageInvaders(int numWide, int numHigh) {
-
-        final BufferedImage image = new BufferedImage(width * 2 * numWide * scale, height * numHigh * scale, BufferedImage.TYPE_INT_ARGB);
-        final ImageCanvas imageCanvas = new ImageCanvas(image);
-
-        for (int y = 0; y < numHigh; y++) {
-            for (int x = 0; x < numWide; x++) {
-                final long value = generateInvader(false);
-                renderInvader(getPixels(value), imageCanvas);
-                imageCanvas.nextInvader();
-            }
-            imageCanvas.nextLine();
-        }
-
-        return image;
+        return getInvaders(numWide, numHigh, new ImageCanvas(width, height, numWide, numHigh, scale));
     }
 
     private static Options options = new Options();
