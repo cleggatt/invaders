@@ -37,13 +37,6 @@ public class Invaders {
     /**
      * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
      */
-    public Invaders(int width, int height) {
-        this(width, height, 1);
-    }
-
-    /**
-     * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
-     */
     public Invaders(int width, int height, int scale) {
         this(width, height, scale, RANDOM, RANDOM);
     }
@@ -224,10 +217,10 @@ public class Invaders {
     static {
         options.addOption("t", "text", false, "generate invader as text");
         options.addOption("p", "png", false, "generate invader as PNG");
-        options.addOption("s", "scale", true, "scaling factor");
-        options.addOption("w", "width", true, "number of tiles wide");
-        options.addOption("h", "height", true, "number of tiles high");
-        options.addOption("b", "border", true, "border width");
+        options.addOption("s", "scale", true, "scaling factor for individual invaders (default: 1)");
+        options.addOption("w", "width", true, "number of invaders wide (default: 1)");
+        options.addOption("h", "height", true, "number of invaders high (default: 1)");
+        options.addOption("b", "border", true, "border width  (default: 0)");
     }
 
     static class Params {
@@ -294,11 +287,13 @@ public class Invaders {
             return null;
         }
 
-        // width and height are required togther or not at all
+        // TODO There is no need to enforce this
+        // width and height are required together or not at all
         if ((cmd.hasOption('w') && !cmd.hasOption('h')) || (!cmd.hasOption('w') && cmd.hasOption('h'))) {
             return null;
         }
 
+        // TODO Make border around invidual tiles and then this can always be provided
         // border is only allowed when tiling
         if (cmd.hasOption('b') && !(cmd.hasOption('w') && cmd.hasOption('h'))) {
             return null;
@@ -312,9 +307,6 @@ public class Invaders {
             }
             fmt = Params.Format.Text;
         } else if (cmd.hasOption('p')) {
-            if (cmd.hasOption('t')) {
-                return null;
-            }
             fmt = Params.Format.Image;
         } else {
             return null;

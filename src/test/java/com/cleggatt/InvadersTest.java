@@ -569,6 +569,7 @@ public class InvadersTest {
                     {new String[]{"--width", "5"}},
                     {new String[]{"--height", "5"}},
                     {new String[]{"--border", "5"}},
+                    {new String[]{"--width", "5", "--height", "5"}},
                     {new String[]{"--text", "--png"}},
                     {new String[]{"--text", "--scale", "X"}},
                     {new String[]{"--text", "--width", "5"}},
