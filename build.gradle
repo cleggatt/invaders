@@ -22,8 +22,8 @@ repositories {
 
 dependencies {
     compile 'commons-cli:commons-cli:1.2'
-    compile 'org.mockito:mockito-all:1.9.5'
     testCompile 'junit:junit:4.11'
+    testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
 cobertura.coverageFormats = ['html', 'xml']
