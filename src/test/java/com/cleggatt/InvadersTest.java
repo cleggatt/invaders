@@ -89,7 +89,7 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final String textInvader = invaders.getTextInvader(1, 1);
+            final String textInvader = invaders.getTextInvaders(1, 1, 0);
             // Verify
             assertEquals(expectedTextInvader, textInvader);
         }
@@ -106,10 +106,16 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final String textInvader = invaders.getTextInvader(1, 1);
+            final String textInvader = invaders.getTextInvaders(1, 1, 0);
 
             // Verify
-            assertEquals("  ****  \n  ****  \n**    **\n**    **\n", textInvader);
+            // @formatter:off
+            assertEquals(
+                    "  ****  \n" +
+                    "  ****  \n" +
+                    "**    **\n" +
+                    "**    **\n", textInvader);
+            // @formatter:on
         }
 
         @Test
@@ -122,10 +128,19 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final String textInvader = invaders.getTextInvader(1, 1);
+            final String textInvader = invaders.getTextInvaders(1, 1, 0);
 
             // Verify
-            assertEquals("  ****  \n  ****  \n**    **\n**    **\n  ****  \n  ****  \n", textInvader);
+            // @formatter:off
+            assertEquals(
+                    "  ****  \n" +
+                    "  ****  \n" +
+                    "**    **\n" +
+                    "**    **\n" +
+                    "  ****  \n" +
+                    "  ****  \n", textInvader);
+            // @formatter:on
+
         }
     }
 
@@ -141,7 +156,7 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final BufferedImage image = invaders.getImageInvaders(1, 1);
+            final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
             final BufferedImage expected = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
@@ -164,7 +179,7 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final BufferedImage image = invaders.getImageInvaders(1, 1);
+            final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
             final BufferedImage expected = new BufferedImage(4, 3, BufferedImage.TYPE_INT_ARGB);
@@ -191,7 +206,7 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final BufferedImage image = invaders.getImageInvaders(1, 1);
+            final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
             final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
@@ -229,7 +244,7 @@ public class InvadersTest {
             Mockito.stub(random.nextDouble()).toReturn(value);
 
             // Exercise
-            final BufferedImage image = invaders.getImageInvaders(1, 1);
+            final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
             final BufferedImage expected = new BufferedImage(8, 6, BufferedImage.TYPE_INT_ARGB);
@@ -283,13 +298,16 @@ public class InvadersTest {
             Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
 
             // Exercise
-            final String textInvader = invaders.getTextInvader(2, 2);
+            final String textInvader = invaders.getTextInvaders(2, 2, 0);
 
             // Verify
-            assertEquals("*  * ** \n" +
-                         "        \n" +
-                         "*  * ** \n" +
-                         " **  ** \n", textInvader);
+            // @formatter:off
+            assertEquals(
+                    "*  * ** \n" +
+                    "        \n" +
+                    "*  * ** \n" +
+                    " **  ** \n", textInvader);
+            // @formatter:on
         }
 
         @Test
@@ -306,7 +324,7 @@ public class InvadersTest {
             Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
 
             // Exercise
-            final BufferedImage image = invaders.getImageInvaders(2, 2);
+            final BufferedImage image = invaders.getImageInvaders(2, 2, 0);
 
             // Verify
             final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
@@ -331,6 +349,110 @@ public class InvadersTest {
 
     }
 
+    public static class BorderTest {
+
+        @Test
+        public void text() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 2, 1, random);
+
+            double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
+            double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
+            double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
+            double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
+            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+
+            // Exercise
+            final String textInvader = invaders.getTextInvaders(2, 2, 2);
+
+            // Verify
+            // @formatter:off
+            assertEquals(
+                    "*  *" + "  " + " ** \n" +
+                    "    " + "  " + "    \n" +
+                    // Start X border
+                    "    " + "  " + "    \n" +
+                    "    " + "  " + "    \n" +
+                    // End X border
+                    "*  *" + "  " + " ** \n" +
+                    " ** " + "  " + " ** \n", textInvader);
+            // @formatter:on
+        }
+
+        @Test
+        public void scaledText() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 2, 2, random);
+
+            double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
+            double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
+            double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
+            double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
+            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+
+            // Exercise
+            final String textInvader = invaders.getTextInvaders(2, 2, 2);
+
+            // Verify
+            // @formatter:off
+            assertEquals(
+                    "**    **" + "  " + "  ****  \n" +
+                    "**    **" + "  " + "  ****  \n" +
+                    "        " + "  " + "        \n" +
+                    "        " + "  " + "        \n" +
+                    // Start Y border
+                    "        " + "  " + "        \n" +
+                    "        " + "  " + "        \n" +
+                    // End Y border
+                    "**    **" + "  " + "  ****  \n" +
+                    "**    **" + "  " + "  ****  \n" +
+                    "  ****  " + "  " + "  ****  \n" +
+                    "  ****  " + "  " + "  ****  \n", textInvader);
+            // @formatter:on
+        }
+
+        @Test
+        public void image() {
+            // Set up
+            SecureRandom random = Mockito.mock(SecureRandom.class);
+
+            final Invaders invaders = new Invaders(2, 2, 1, random);
+
+            double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
+            double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
+            double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
+            double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
+            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+
+            // Exercise
+            final BufferedImage image = invaders.getImageInvaders(2, 2, 2);
+
+            // Verify
+            final BufferedImage expected = new BufferedImage(10, 6, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(0, 0, Color.GREEN.getRGB());
+            expected.setRGB(3, 0, Color.GREEN.getRGB());
+
+            expected.setRGB(7, 0, Color.GREEN.getRGB());
+            expected.setRGB(8, 0, Color.GREEN.getRGB());
+
+            expected.setRGB(0, 4, Color.GREEN.getRGB());
+            expected.setRGB(3, 4, Color.GREEN.getRGB());
+            expected.setRGB(1, 5, Color.GREEN.getRGB());
+            expected.setRGB(2, 5, Color.GREEN.getRGB());
+
+            expected.setRGB(7, 4, Color.GREEN.getRGB());
+            expected.setRGB(8, 4, Color.GREEN.getRGB());
+            expected.setRGB(7, 5, Color.GREEN.getRGB());
+            expected.setRGB(8, 5, Color.GREEN.getRGB());
+
+            assertImageEquals(expected, image);
+        }
+    }
+
     public static class ParseParamsTest {
         @Test
         public void textParamShouldReturnSingleText() {
@@ -339,8 +461,10 @@ public class InvadersTest {
             // Verify
             assertNotNull(params);
             assertEquals(Invaders.Params.Format.Text, params.getFormat());
+            assertEquals(1, params.getScale());
             assertEquals(1, params.getNumWide());
             assertEquals(1, params.getNumHigh());
+            assertEquals(0, params.getBorder());
         }
 
         @Test
@@ -350,20 +474,23 @@ public class InvadersTest {
             // Verify
             assertNotNull(params);
             assertEquals(Invaders.Params.Format.Text, params.getFormat());
-            assertEquals(3,params.getScale());
-            assertEquals(1,params.getNumWide());
-            assertEquals(1,params.getNumHigh());
+            assertEquals(3, params.getScale());
+            assertEquals(1, params.getNumWide());
+            assertEquals(1, params.getNumHigh());
+            assertEquals(0, params.getBorder());
         }
 
         @Test
-        public void textWithWidthAndHeightParamShouldReturnTiledImage() {
+        public void textWithTileParamShouldReturnTiledImage() {
             // Exercise
-            final Invaders.Params params = Invaders.parseParams(new String[]{"--text", "--width",  "4", "--height", "5"});
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--text", "--width",  "4", "--height", "5", "--border", "2"});
             // Verify
             assertNotNull(params);
             assertEquals(Invaders.Params.Format.Text, params.getFormat());
+            assertEquals(1, params.getScale());
             assertEquals(4, params.getNumWide());
             assertEquals(5, params.getNumHigh());
+            assertEquals(2, params.getBorder());
         }
 
         @Test
@@ -376,6 +503,7 @@ public class InvadersTest {
             assertEquals(1,params.getScale(), 1);
             assertEquals(1,params.getNumWide(), 1);
             assertEquals(1,params.getNumHigh(), 1);
+            assertEquals(0, params.getBorder());
         }
 
         @Test
@@ -388,17 +516,20 @@ public class InvadersTest {
             assertEquals(3, params.getScale());
             assertEquals(1, params.getNumWide());
             assertEquals(1, params.getNumHigh());
+            assertEquals(0, params.getBorder());
         }
 
         @Test
-        public void pngWithWidthAndHeightParamShouldReturnTiledImage() {
+        public void pngWithTileParamShouldReturnTiledImage() {
             // Exercise
-            final Invaders.Params params = Invaders.parseParams(new String[]{"--png", "--width",  "4", "--height", "5"});
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--png", "--width",  "4", "--height", "5", "--border", "2"});
             // Verify
             assertNotNull(params);
             assertEquals(Invaders.Params.Format.Image, params.getFormat());
+            assertEquals(1, params.getScale());
             assertEquals(4, params.getNumWide());
             assertEquals(5, params.getNumHigh());
+            assertEquals(2, params.getBorder());
         }
     }
 
@@ -418,15 +549,25 @@ public class InvadersTest {
                     {new String[]{"--scale"}},
                     {new String[]{"--width"}},
                     {new String[]{"--height"}},
-                    {new String[]{"--text", "--scale", "X"}},
+                    {new String[]{"--border"}},
+                    {new String[]{"--width", "5"}},
+                    {new String[]{"--height", "5"}},
+                    {new String[]{"--border", "5"}},
                     {new String[]{"--text", "--png"}},
+                    {new String[]{"--text", "--scale", "X"}},
                     {new String[]{"--text", "--width", "5"}},
                     {new String[]{"--text", "--height", "5"}},
+                    {new String[]{"--text", "--border", "5"}},
+                    {new String[]{"--text", "--width", "X", "--height", "5", "--border", "2"}},
+                    {new String[]{"--text", "--width", "5", "--height", "X", "--border", "2"}},
+                    {new String[]{"--text", "--width", "5", "--height", "5", "--border", "X"}},
+                    {new String[]{"--png", "--scale", "X"}},
                     {new String[]{"--png", "--width", "5"}},
                     {new String[]{"--png", "--height", "5"}},
-                    {new String[]{"--png", "--width", "X", "--height", "5"}},
-                    {new String[]{"--png", "--width", "5", "--height", "X"}},
-                    {new String[]{"--png", "--scale", "X"}},
+                    {new String[]{"--png", "--border", "5"}},
+                    {new String[]{"--png", "--width", "X", "--height", "5", "--border", "2"}},
+                    {new String[]{"--png", "--width", "5", "--height", "X", "--border", "2"}},
+                    {new String[]{"--png", "--width", "5", "--height", "5", "--border", "X"}},
             });
         }
 

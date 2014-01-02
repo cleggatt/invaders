@@ -4,8 +4,6 @@ import org.apache.commons.cli.*;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -58,7 +56,7 @@ public class Invaders {
         return invader;
     }
 
-    boolean[][] getPixels(long value) {
+    boolean[][] getPixels(final long value) {
 
         final boolean[][] pixels = new boolean[height][width * 2];
 
@@ -81,25 +79,25 @@ public class Invaders {
         T getInvader();
     }
 
-    private void drawScaledPixel(final int x, final int y, InvaderCanvas canvas) {
+    private void drawScaledPixel(final int x, final int y, final int xOffset, final int yOffset, InvaderCanvas canvas) {
         for (int scaledY = (y * scale); scaledY < ((y * scale)) + scale; scaledY++) {
             for (int scaledX = (x * scale); scaledX < ((x * scale)) + scale; scaledX++) {
-                canvas.drawPixel(scaledX, scaledY);
+                canvas.drawPixel(xOffset + scaledX, yOffset + scaledY);
             }
         }
     }
 
-    private void renderInvader(boolean[][] pixels, InvaderCanvas canvas, int xOffset, int yOffset) {
+    private void renderInvader(boolean[][] pixels, InvaderCanvas canvas, final int xOffset, final int yOffset) {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < (width * 2); x++) {
                 if (pixels[y][x]) {
-                    drawScaledPixel(xOffset + x, yOffset + y, canvas);
+                    drawScaledPixel(x, y, xOffset, yOffset, canvas);
                 }
             }
         }
     }
 
-    private <T> T getInvaders(int numWide, int numHigh, InvaderCanvas<T> invaderCanvas) {
+    private <T> T getInvaders(final int numWide, final int numHigh, final int border, InvaderCanvas<T> invaderCanvas) {
 
         boolean verbose = (numWide == 1 && numHigh == 1);
 
@@ -108,10 +106,11 @@ public class Invaders {
             for (int x = 0; x < numWide; x++) {
                 final long value = generateInvader(verbose);
                 renderInvader(getPixels(value), invaderCanvas, xOffset, yOffset);
-                xOffset += (width * 2);
+
+                xOffset = xOffset + ((width * 2 * scale) + border);
             }
             xOffset = 0;
-            yOffset += height;
+            yOffset = yOffset + (height * scale) + border;
         }
 
         return invaderCanvas.getInvader();
@@ -124,25 +123,24 @@ public class Invaders {
         private int lineWidth;
         private final StringBuffer buffer;
 
-        private TextCanvas(int width, int height, int scale, int numWide, int numHigh) {
+        private TextCanvas(int width, int height, int scale, int numWide, int numHigh, int border) {
             scaledHeight = height * scale;
             scaledWidth = width * scale;
-            lineWidth = scaledWidth * 2 * numWide;
-            buffer = createBuffer(height, scale, numWide, numHigh);
+            lineWidth = (scaledWidth * 2 * numWide) + ((numWide - 1) * border);
+            buffer = createBuffer(numWide, numHigh, border);
         }
 
-        private StringBuffer createBuffer(final int height, final int scale, final int numWide, final int numHigh) {
+        private StringBuffer createBuffer(final int numWide, final int numHigh, final int border) {
 
-            final int numLines = scaledHeight * numHigh;
+            final int numLines = (scaledHeight * numHigh) + ((numHigh - 1) * border);
             final int lineBreaks = scaledHeight;
 
             int bufferSize = (lineWidth * numLines) + lineBreaks;
 
             final StringBuffer buffer = new StringBuffer(bufferSize);
 
-            int pixelsInLine = scaledWidth * 2 * numWide;
             for (int y = 0; y < numLines; y++) {
-                for (int x = 0; x < pixelsInLine; x++) {
+                for (int x = 0; x < lineWidth; x++) {
                     buffer.append(' ');
                 }
                 buffer.append('\n');
@@ -152,7 +150,7 @@ public class Invaders {
         }
 
         @Override
-        public void drawPixel(int x, int y) {
+        public void drawPixel(final int x, final int y) {
             int pos = 0;
             pos = pos + (y * lineWidth); // Number of lines down
             pos = pos + y; // Allow for line feeds
@@ -170,8 +168,11 @@ public class Invaders {
 
         private final BufferedImage image;
 
-        private ImageCanvas(int width, int height, int scale, int numWide, int numHigh) {
-            image = new BufferedImage(width * 2 * numWide * scale, height * numHigh * scale, BufferedImage.TYPE_INT_ARGB);
+        private ImageCanvas(int width, int height, int scale, int numWide, int numHigh, int border) {
+            int imageWidth = (width * 2 * numWide * scale) + ((numWide - 1) * border);
+            int imageHeight = (height * numHigh * scale) + ((numHigh - 1) * border);
+
+            image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         }
 
         @Override
@@ -185,12 +186,12 @@ public class Invaders {
         }
     }
 
-    public String getTextInvader(int numWide, int numHigh) {
-        return getInvaders(numWide, numHigh, new TextCanvas(width, height, scale, numWide, numHigh));
+    public String getTextInvaders(final int numWide, final int numHigh, final int border) {
+        return getInvaders(numWide, numHigh, border, new TextCanvas(width, height, scale, numWide, numHigh, border));
     }
 
-    public BufferedImage getImageInvaders(int numWide, int numHigh) {
-        return getInvaders(numWide, numHigh, new ImageCanvas(width, height, scale, numWide, numHigh));
+    public BufferedImage getImageInvaders(final int numWide, final int numHigh, final int border) {
+        return getInvaders(numWide, numHigh, border, new ImageCanvas(width, height, scale, numWide, numHigh, border));
     }
 
     private static Options options = new Options();
@@ -199,8 +200,9 @@ public class Invaders {
         options.addOption("t", "text", false, "generate invader as text");
         options.addOption("p", "png", false, "generate invader as PNG");
         options.addOption("s", "scale", true, "scaling factor");
-        options.addOption("w", "width", true, "number of tiles wide (PNG only)");
-        options.addOption("h", "height", true, "number of tiles high (PNG only)");
+        options.addOption("w", "width", true, "number of tiles wide");
+        options.addOption("h", "height", true, "number of tiles high");
+        options.addOption("b", "border", true, "border width");
     }
 
     static class Params {
@@ -209,10 +211,11 @@ public class Invaders {
             Text, Image
         }
 
-        private Format format;
-        private int scale;
-        private int numWide;
-        private int numHigh;
+        private final Format format;
+        private final int scale;
+        private final int numWide;
+        private final int numHigh;
+        private final int border;
 
         Format getFormat() {
             return format;
@@ -230,11 +233,16 @@ public class Invaders {
             return numHigh;
         }
 
-        Params(Format format, int scale, int numWide, int numHigh) {
+        int getBorder() {
+            return border;
+        }
+
+        Params(Format format, int scale, int numWide, int numHigh, int border) {
             this.format = format;
             this.scale = scale;
             this.numWide = numWide;
             this.numHigh = numHigh;
+            this.border = border;
         }
     }
 
@@ -248,18 +256,26 @@ public class Invaders {
             return null;
         }
 
+        int scale;
         int width;
         int height;
-        int scale;
+        int border;
         try {
+            scale = Integer.parseInt(cmd.getOptionValue('s', "1"));
             width = Integer.parseInt(cmd.getOptionValue('w', "1"));
             height = Integer.parseInt(cmd.getOptionValue('h', "1"));
-            scale = Integer.parseInt(cmd.getOptionValue('s', "1"));
+            border = Integer.parseInt(cmd.getOptionValue('b', "0"));
         } catch (NumberFormatException e) {
             return null;
         }
 
+        // width and height are required togther or not at all
         if ((cmd.hasOption('w') && !cmd.hasOption('h')) || (!cmd.hasOption('w') && cmd.hasOption('h'))) {
+            return null;
+        }
+
+        // border is only allowed when tiling
+        if (cmd.hasOption('b') && !(cmd.hasOption('w') && cmd.hasOption('h'))) {
             return null;
         }
 
@@ -279,7 +295,7 @@ public class Invaders {
             return null;
         }
 
-        return new Params(fmt, scale, width, height);
+        return new Params(fmt, scale, width, height, border);
     }
 
     public static void main(String[] args) {
@@ -294,10 +310,10 @@ public class Invaders {
 
         switch (params.format) {
             case Text:
-                System.out.println(invader.getTextInvader(params.getNumWide(), params.getNumWide()));
+                System.out.println(invader.getTextInvaders(params.getNumWide(), params.getNumWide(), params.getBorder()));
                 break;
             case Image:
-                final BufferedImage image = invader.getImageInvaders(params.getNumWide(), params.getNumWide());
+                final BufferedImage image = invader.getImageInvaders(params.getNumWide(), params.getNumWide(), params.getBorder());
                 final File output = new File("invader.png");
                 try {
                     ImageIO.write(image, "PNG", output);
