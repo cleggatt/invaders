@@ -1,5 +1,6 @@
-package com.cleggatt;
+package com.cleggatt.invaders;
 
+import com.cleggatt.invaders.Invaders;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;

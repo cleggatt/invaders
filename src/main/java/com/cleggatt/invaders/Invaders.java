@@ -1,4 +1,4 @@
-package com.cleggatt;
+package com.cleggatt.invaders;
 
 import org.apache.commons.cli.*;
 
@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Random;
 
 public class Invaders {
