@@ -27,12 +27,17 @@ public class Invaders {
         this(width, height, 1);
     }
 
-    // TODO Comment width is doubled!
+    /**
+     * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
+     */
     public Invaders(int width, int height, int scale) {
-        // We use SecureRandom to ensure we get the full range of long values (which won't be returned by Random)
         this(width, height, scale, new SecureRandom());
     }
 
+    /**
+     * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
+     */
+    // We use SecureRandom to ensure we get the full range of long values (which won't be returned by Random)
     Invaders(int width, int height, int scale, SecureRandom random) {
         this.random = random;
         this.width = width;
