@@ -103,16 +103,17 @@ public class Invaders {
 
         boolean verbose = (numWide == 1 && numHigh == 1);
 
-        int xOffset = 0, yOffset = 0;
+        int xOffset = border,
+            yOffset = border;
         for (int y = 0; y < numHigh; y++) {
             for (int x = 0; x < numWide; x++) {
                 final long value = generateInvader(verbose);
                 renderInvader(getPixels(value), invaderCanvas, xOffset, yOffset);
 
-                xOffset = xOffset + ((width * 2 * scale) + border);
+                xOffset = xOffset + ((width * 2 * scale) + (border * 2));
             }
-            xOffset = 0;
-            yOffset = yOffset + (height * scale) + border;
+            xOffset = border;
+            yOffset = yOffset + (height * scale) + (border * 2);
         }
 
         return invaderCanvas.getInvader();
@@ -128,13 +129,13 @@ public class Invaders {
         private TextCanvas(int width, int height, int scale, int numWide, int numHigh, int border) {
             scaledHeight = height * scale;
             scaledWidth = width * scale;
-            lineWidth = (scaledWidth * 2 * numWide) + ((numWide - 1) * border);
+            lineWidth = (scaledWidth * 2 * numWide) + (numWide * border * 2);
             buffer = createBuffer(numWide, numHigh, border);
         }
 
         private StringBuffer createBuffer(final int numWide, final int numHigh, final int border) {
 
-            final int numLines = (scaledHeight * numHigh) + ((numHigh - 1) * border);
+            final int numLines = (scaledHeight * numHigh) + (numHigh * border * 2);
             final int lineBreaks = scaledHeight;
 
             int bufferSize = (lineWidth * numLines) + lineBreaks;
@@ -171,8 +172,8 @@ public class Invaders {
         private final BufferedImage image;
 
         private ImageCanvas(int width, int height, int scale, int numWide, int numHigh, int border) {
-            int imageWidth = (width * 2 * numWide * scale) + ((numWide - 1) * border);
-            int imageHeight = (height * numHigh * scale) + ((numHigh - 1) * border);
+            int imageWidth = (width * 2 * numWide * scale) + (numWide * border * 2);
+            int imageHeight = (height * numHigh * scale) + (numHigh * border * 2);
 
             image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         }

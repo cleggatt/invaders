@@ -379,14 +379,22 @@ public class InvadersTest {
             // Verify
             // @formatter:off
             assertEquals(
-                    "*  *" + "  " + " ** \n" +
-                    "    " + "  " + "    \n" +
-                    // Start X border
-                    "    " + "  " + "    \n" +
-                    "    " + "  " + "    \n" +
-                    // End X border
-                    "*  *" + "  " + " ** \n" +
-                    " ** " + "  " + " ** \n", textInvader);
+                    // 1st Row
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "*  *" + "  " /**/ + "  " + " ** " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    // 2nd row
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "*  *" + "  " /**/ + "  " + " ** " + "  " + "\n" +
+                    "  " + " ** " + "  " /**/ + "  " + " ** " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n" +
+                    "  " + "    " + "  " /**/ + "  " + "    " + "  " + "\n"
+                    // End
+                    , textInvader);
             // @formatter:on
         }
 
@@ -409,18 +417,26 @@ public class InvadersTest {
             // Verify
             // @formatter:off
             assertEquals(
-                    "**    **" + "  " + "  ****  \n" +
-                    "**    **" + "  " + "  ****  \n" +
-                    "        " + "  " + "        \n" +
-                    "        " + "  " + "        \n" +
-                    // Start Y border
-                    "        " + "  " + "        \n" +
-                    "        " + "  " + "        \n" +
-                    // End Y border
-                    "**    **" + "  " + "  ****  \n" +
-                    "**    **" + "  " + "  ****  \n" +
-                    "  ****  " + "  " + "  ****  \n" +
-                    "  ****  " + "  " + "  ****  \n", textInvader);
+                    // 1st row
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "**    **" + "  " /**/ + "  " + "  ****  " + "  " + "\n" +
+                    "  " + "**    **" + "  " /**/ + "  " + "  ****  " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    // 2nd row
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "**    **" + "  " /**/ + "  " + "  ****  " + "  " + "\n" +
+                    "  " + "**    **" + "  " /**/ + "  " + "  ****  " + "  " + "\n" +
+                    "  " + "  ****  " + "  " /**/ + "  " + "  ****  " + "  " + "\n" +
+                    "  " + "  ****  " + "  " /**/ + "  " + "  ****  " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n" +
+                    "  " + "        " + "  " /**/ + "  " + "        " + "  " + "\n",
+                    // End
+                    textInvader);
             // @formatter:on
         }
 
@@ -441,22 +457,22 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(2, 2, 2);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(10, 6, BufferedImage.TYPE_INT_ARGB);
-            expected.setRGB(0, 0, Color.GREEN.getRGB());
-            expected.setRGB(3, 0, Color.GREEN.getRGB());
+            final BufferedImage expected = new BufferedImage(16, 12, BufferedImage.TYPE_INT_ARGB);
+            expected.setRGB(2, 2, Color.GREEN.getRGB());
+            expected.setRGB(5, 2, Color.GREEN.getRGB());
 
-            expected.setRGB(7, 0, Color.GREEN.getRGB());
-            expected.setRGB(8, 0, Color.GREEN.getRGB());
+            expected.setRGB(11, 2, Color.GREEN.getRGB());
+            expected.setRGB(12, 2, Color.GREEN.getRGB());
 
-            expected.setRGB(0, 4, Color.GREEN.getRGB());
-            expected.setRGB(3, 4, Color.GREEN.getRGB());
-            expected.setRGB(1, 5, Color.GREEN.getRGB());
-            expected.setRGB(2, 5, Color.GREEN.getRGB());
+            expected.setRGB(2, 8, Color.GREEN.getRGB());
+            expected.setRGB(5, 8, Color.GREEN.getRGB());
+            expected.setRGB(3, 9, Color.GREEN.getRGB());
+            expected.setRGB(4, 9, Color.GREEN.getRGB());
 
-            expected.setRGB(7, 4, Color.GREEN.getRGB());
-            expected.setRGB(8, 4, Color.GREEN.getRGB());
-            expected.setRGB(7, 5, Color.GREEN.getRGB());
-            expected.setRGB(8, 5, Color.GREEN.getRGB());
+            expected.setRGB(11, 8, Color.GREEN.getRGB());
+            expected.setRGB(12, 8, Color.GREEN.getRGB());
+            expected.setRGB(11, 9, Color.GREEN.getRGB());
+            expected.setRGB(12, 9, Color.GREEN.getRGB());
 
             assertImageEquals(expected, image);
         }
