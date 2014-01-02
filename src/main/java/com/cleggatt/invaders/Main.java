@@ -11,18 +11,32 @@ import java.util.Random;
 
 public final class Main {
 
+    // @VisibleForTesting
+    static final int DEFAULT_X = 4;
+    private static final String DEFAULT_X_STR = String.valueOf(DEFAULT_X);
+    // @VisibleForTesting
+    static final int DEFAULT_Y = 8;
+    private static final String DEFAULT_Y_STR = String.valueOf(DEFAULT_Y);
+
     private Main() {
     }
 
     private static Options options = new Options();
     static {
-        options.addOption("t", "text", false, "generate invader as text");
-        options.addOption("p", "png", false, "generate invader as PNG");
-        options.addOption("s", "scale", true, "scaling factor for individual invaders (default: 1)");
-        options.addOption("w", "width", true, "number of invaders wide (default: 1)");
-        options.addOption("h", "height", true, "number of invaders high (default: 1)");
-        options.addOption("b", "border", true, "border width  (default: 0)");
-        options.addOption("seed", true, "random seed for invader generation");
+        options.addOption("t", "text", false, "generate as text");
+        options.addOption("p", "png", false, "generate as PNG");
+
+        options.addOption("x", true, String.format("number of un-mirrored, un-scaled pixels on the X axis of a tile (default: %d)", DEFAULT_X));
+        options.addOption("y", true, String.format("number of un-scaled pixels on the Y axis of a tile (default: %d)", DEFAULT_Y));
+
+        options.addOption("s", "scale", true, "scaling factor for a tile (default: 1)");
+
+        options.addOption("w", "width", true, "number of tiles wide (default: 1)");
+        options.addOption("h", "height", true, "number of tiles high (default: 1)");
+
+        options.addOption("b", "border", true, "border width for a tile (default: 0)");
+
+        options.addOption("seed", true, "random seed for tile generation");
     }
 
     // @VisibleForTesting
@@ -32,6 +46,8 @@ public final class Main {
         }
 
         private final Format format;
+        private final int x;
+        private final int y;
         private final int scale;
         private final int numWide;
         private final int numHigh;
@@ -40,6 +56,14 @@ public final class Main {
 
         Format getFormat() {
             return format;
+        }
+
+        int getX() {
+            return x;
+        }
+
+        int getY() {
+            return y;
         }
 
         int getScale() {
@@ -62,7 +86,9 @@ public final class Main {
             return seed;
         }
 
-        Params(Format format, int scale, int numWide, int numHigh, int border, Long seed) {
+        Params(Format format, int x, int y, int scale, int numWide, int numHigh, int border, Long seed) {
+            this.x = x;
+            this.y = y;
             this.format = format;
             this.scale = scale;
             this.numWide = numWide;
@@ -83,11 +109,15 @@ public final class Main {
             return null;
         }
 
+        int x;
+        int y;
         int scale;
         int width;
         int height;
         int border;
         try {
+            x = Integer.parseInt(cmd.getOptionValue('x', DEFAULT_X_STR));
+            y = Integer.parseInt(cmd.getOptionValue('y', DEFAULT_Y_STR));
             scale = Integer.parseInt(cmd.getOptionValue('s', "1"));
             width = Integer.parseInt(cmd.getOptionValue('w', "1"));
             height = Integer.parseInt(cmd.getOptionValue('h', "1"));
@@ -105,18 +135,6 @@ public final class Main {
             }
         }
 
-        // TODO There is no need to enforce this
-        // width and height are required together or not at all
-        if ((cmd.hasOption('w') && !cmd.hasOption('h')) || (!cmd.hasOption('w') && cmd.hasOption('h'))) {
-            return null;
-        }
-
-        // TODO Make border around invidual tiles and then this can always be provided
-        // border is only allowed when tiling
-        if (cmd.hasOption('b') && !(cmd.hasOption('w') && cmd.hasOption('h'))) {
-            return null;
-        }
-
         Params.Format fmt;
 
         if (cmd.hasOption('t')) {
@@ -130,7 +148,7 @@ public final class Main {
             return null;
         }
 
-        return new Params(fmt, scale, width, height, border, seed);
+        return new Params(fmt, x, y, scale, width, height, border, seed);
     }
 
     // @VisibleForTesting
@@ -149,7 +167,7 @@ public final class Main {
             System.exit(1);
         }
 
-        final Invaders invader = new Invaders(4, 8, params.getScale(), seed(new Random(), params), new Random());
+        final Invaders invader = new Invaders(params.getX(), params.getY(), params.getScale(), seed(new Random(), params), new Random());
 
         switch (params.getFormat()) {
             case Text:
