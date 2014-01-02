@@ -55,14 +55,14 @@ public class InvadersTest {
     }
 
     @RunWith(Parameterized.class)
-    public static class GetTextInvaderTest {
+    public static class TextInvaderTest {
 
         private final int width;
         private final int height;
         private final long invader;
         private final String expectedTextInvader;
 
-        public GetTextInvaderTest(int width, int height, long invader, String expectedTextInvader) {
+        public TextInvaderTest(int width, int height, long invader, String expectedTextInvader) {
             this.width = width;
             this.height = height;
             this.invader = invader;
@@ -97,7 +97,7 @@ public class InvadersTest {
 
     public static class ScaledTextInvaderTest {
         @Test
-        public void testGetSquareTextInvader() {
+        public void square() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
             final Invaders invaders = new Invaders(2, 2, 2, random);
@@ -113,7 +113,7 @@ public class InvadersTest {
         }
 
         @Test
-        public void testGetNonSquareTextInvader() {
+        public void nonSquare() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
             final Invaders invaders = new Invaders(2, 3, 2, random);
@@ -129,9 +129,9 @@ public class InvadersTest {
         }
     }
 
-    public static class GetImageInvaderTest {
+    public static class ImageInvaderTest {
         @Test
-        public void testSingleSquareInvaderGeneration() {
+        public void square() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -154,7 +154,7 @@ public class InvadersTest {
         }
 
         @Test
-        public void testSingleNonSquareInvaderGeneration() {
+        public void nonSquare() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -177,9 +177,11 @@ public class InvadersTest {
 
             assertImageEquals(expected, image);
         }
+    }
 
+    public static class ScaledImageInvaderTest {
         @Test
-        public void testScaledSquareInvaderGeneration() {
+        public void square() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -217,7 +219,7 @@ public class InvadersTest {
         }
 
         @Test
-        public void testScaledNonSquareInvaderGeneration() {
+        public void nonSquare() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -268,7 +270,7 @@ public class InvadersTest {
     public static class TiledTest {
 
         @Test
-        public void testTextTiling() {
+        public void text() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
@@ -291,7 +293,7 @@ public class InvadersTest {
         }
 
         @Test
-        public void testImageTiling() {
+        public void image() {
             // Set up
             SecureRandom random = Mockito.mock(SecureRandom.class);
 
