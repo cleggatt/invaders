@@ -25,9 +25,7 @@ public class Invaders {
             Color.blue
     };
 
-    private static final SecureRandom RANDOM = new SecureRandom();
-
-    private final SecureRandom invaderRandom;
+    private final Random invaderRandom;
     private final Random colourRandom;
     private final int width;
     private final int height;
@@ -37,15 +35,8 @@ public class Invaders {
     /**
      * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
      */
-    public Invaders(int width, int height, int scale) {
-        this(width, height, scale, RANDOM, RANDOM);
-    }
-
-    /**
-     * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
-     */
     // We use SecureRandom to ensure we get the full range of long values (which won't be returned by Random)
-    Invaders(int width, int height, int scale, SecureRandom invaderRandom, Random colourRandom) {
+    public Invaders(int width, int height, int scale, Random invaderRandom, Random colourRandom) {
         this.invaderRandom = invaderRandom;
         this.colourRandom = colourRandom;
         this.width = width;
@@ -183,11 +174,9 @@ public class Invaders {
 
     private static class ImageCanvas implements InvaderCanvas<BufferedImage> {
 
-        private final SecureRandom random;
         private final BufferedImage image;
 
-        private ImageCanvas(SecureRandom random, int width, int height, int scale, int numWide, int numHigh, int border) {
-            this.random = random;
+        private ImageCanvas(int width, int height, int scale, int numWide, int numHigh, int border) {
             int imageWidth = (width * 2 * numWide * scale) + ((numWide - 1) * border);
             int imageHeight = (height * numHigh * scale) + ((numHigh - 1) * border);
 
@@ -210,7 +199,7 @@ public class Invaders {
     }
 
     public BufferedImage getImageInvaders(final int numWide, final int numHigh, final int border) {
-        return getInvaders(numWide, numHigh, border, new ImageCanvas(invaderRandom, width, height, scale, numWide, numHigh, border));
+        return getInvaders(numWide, numHigh, border, new ImageCanvas(width, height, scale, numWide, numHigh, border));
     }
 
     private static Options options = new Options();
@@ -221,10 +210,10 @@ public class Invaders {
         options.addOption("w", "width", true, "number of invaders wide (default: 1)");
         options.addOption("h", "height", true, "number of invaders high (default: 1)");
         options.addOption("b", "border", true, "border width  (default: 0)");
+        options.addOption("seed", true, "random seed for invader generation");
     }
 
     static class Params {
-
         enum Format {
             Text, Image
         }
@@ -234,6 +223,7 @@ public class Invaders {
         private final int numWide;
         private final int numHigh;
         private final int border;
+        private final Long seed;
 
         Format getFormat() {
             return format;
@@ -255,12 +245,17 @@ public class Invaders {
             return border;
         }
 
-        Params(Format format, int scale, int numWide, int numHigh, int border) {
+        public Long getSeed() {
+            return seed;
+        }
+
+        Params(Format format, int scale, int numWide, int numHigh, int border, Long seed) {
             this.format = format;
             this.scale = scale;
             this.numWide = numWide;
             this.numHigh = numHigh;
             this.border = border;
+            this.seed = seed;
         }
     }
 
@@ -285,6 +280,15 @@ public class Invaders {
             border = Integer.parseInt(cmd.getOptionValue('b', "0"));
         } catch (NumberFormatException e) {
             return null;
+        }
+
+        Long seed = null;
+        if (cmd.hasOption("seed")) {
+            try {
+                seed = Long.parseLong(cmd.getOptionValue("seed"));
+            } catch (NumberFormatException e) {
+                return null;
+            }
         }
 
         // TODO There is no need to enforce this
@@ -312,7 +316,14 @@ public class Invaders {
             return null;
         }
 
-        return new Params(fmt, scale, width, height, border);
+        return new Params(fmt, scale, width, height, border, seed);
+    }
+
+    static Random seed(Random random, Params params) {
+        if (params.getSeed() != null) {
+            random.setSeed(params.getSeed());
+        }
+        return random;
     }
 
     public static void main(String[] args) {
@@ -323,7 +334,7 @@ public class Invaders {
             System.exit(1);
         }
 
-        final Invaders invader = new Invaders(4, 8, params.getScale());
+        final Invaders invader = new Invaders(4, 8, params.getScale(), seed(new Random(), params), new Random());
 
         switch (params.format) {
             case Text:

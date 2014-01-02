@@ -1,25 +1,18 @@
 package com.cleggatt;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.stub;
-
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
 
-import java.awt.*;
+import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 @RunWith(Enclosed.class)
 public class InvadersTest {
@@ -58,7 +51,7 @@ public class InvadersTest {
         @Test
         public void testGetPixels() {
             // Set up
-            final Invaders invaders = new Invaders(width, height, 1);
+            final Invaders invaders = new Invaders(width, height, 1, mock(Random.class), mock(Random.class));
             // Exercise
             final boolean[][] pixels = invaders.getPixels(invader);
             // Verify
@@ -94,7 +87,7 @@ public class InvadersTest {
         @Test
         public void testGetTextInvader() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
             final Invaders invaders = new Invaders(width, height, 1, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(invader, invaders.getMaxValue());
@@ -111,7 +104,7 @@ public class InvadersTest {
         @Test
         public void square() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
             final Invaders invaders = new Invaders(2, 2, 2, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
@@ -133,7 +126,7 @@ public class InvadersTest {
         @Test
         public void nonSquare() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
             final Invaders invaders = new Invaders(2, 3, 2, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
@@ -160,7 +153,7 @@ public class InvadersTest {
         @Test
         public void square() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
@@ -183,7 +176,7 @@ public class InvadersTest {
         @Test
         public void nonSquare() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 3, 1, random, greenRandom());
 
@@ -210,7 +203,7 @@ public class InvadersTest {
         @Test
         public void square() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 2, random, greenRandom());
 
@@ -248,7 +241,7 @@ public class InvadersTest {
         @Test
         public void nonSquare() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 3, 2, random, greenRandom());
 
@@ -299,7 +292,7 @@ public class InvadersTest {
         @Test
         public void text() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
@@ -325,7 +318,7 @@ public class InvadersTest {
         @Test
         public void image() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
             Random colourRandom = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 1, random, colourRandom);
@@ -370,7 +363,7 @@ public class InvadersTest {
         @Test
         public void text() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
@@ -400,7 +393,7 @@ public class InvadersTest {
         @Test
         public void scaledText() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 2, random, greenRandom());
 
@@ -434,7 +427,7 @@ public class InvadersTest {
         @Test
         public void image() {
             // Set up
-            SecureRandom random = mock(SecureRandom.class);
+            Random random = mock(Random.class);
 
             final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
@@ -481,10 +474,11 @@ public class InvadersTest {
             assertEquals(1, params.getNumWide());
             assertEquals(1, params.getNumHigh());
             assertEquals(0, params.getBorder());
+            assertEquals(null, params.getSeed());
         }
 
         @Test
-        public void textParamwithScaleShouldReturnScaledText() {
+        public void textParamWithScaleShouldReturnScaledText() {
             // Exercise
             final Invaders.Params params = Invaders.parseParams(new String[]{"--text", "--scale", "3"});
             // Verify
@@ -494,6 +488,7 @@ public class InvadersTest {
             assertEquals(1, params.getNumWide());
             assertEquals(1, params.getNumHigh());
             assertEquals(0, params.getBorder());
+            assertEquals(null, params.getSeed());
         }
 
         @Test
@@ -507,6 +502,7 @@ public class InvadersTest {
             assertEquals(4, params.getNumWide());
             assertEquals(5, params.getNumHigh());
             assertEquals(2, params.getBorder());
+            assertEquals(null, params.getSeed());
         }
 
         @Test
@@ -520,6 +516,7 @@ public class InvadersTest {
             assertEquals(1,params.getNumWide(), 1);
             assertEquals(1,params.getNumHigh(), 1);
             assertEquals(0, params.getBorder());
+            assertEquals(null, params.getSeed());
         }
 
         @Test
@@ -533,6 +530,7 @@ public class InvadersTest {
             assertEquals(1, params.getNumWide());
             assertEquals(1, params.getNumHigh());
             assertEquals(0, params.getBorder());
+            assertEquals(null, params.getSeed());
         }
 
         @Test
@@ -546,6 +544,21 @@ public class InvadersTest {
             assertEquals(4, params.getNumWide());
             assertEquals(5, params.getNumHigh());
             assertEquals(2, params.getBorder());
+            assertEquals(null, params.getSeed());
+        }
+
+        @Test
+        public void seedShouldBeParsed() {
+            // Exercise
+            final Invaders.Params params = Invaders.parseParams(new String[]{"--png", "--seed", "42"});
+            // Verify
+            assertNotNull(params);
+            assertEquals(Invaders.Params.Format.Image, params.getFormat());
+            assertEquals(1, params.getScale());
+            assertEquals(1, params.getNumWide());
+            assertEquals(1, params.getNumHigh());
+            assertEquals(0, params.getBorder());
+            assertEquals(Long.valueOf(42), params.getSeed());
         }
     }
 
@@ -566,12 +579,15 @@ public class InvadersTest {
                     {new String[]{"--width"}},
                     {new String[]{"--height"}},
                     {new String[]{"--border"}},
+                    {new String[]{"--seed"}},
                     {new String[]{"--width", "5"}},
                     {new String[]{"--height", "5"}},
                     {new String[]{"--border", "5"}},
+                    {new String[]{"--seed", "42"}},
                     {new String[]{"--width", "5", "--height", "5"}},
                     {new String[]{"--text", "--png"}},
                     {new String[]{"--text", "--scale", "X"}},
+                    {new String[]{"--text", "--seed", "X"}},
                     {new String[]{"--text", "--width", "5"}},
                     {new String[]{"--text", "--height", "5"}},
                     {new String[]{"--text", "--border", "5"}},
@@ -579,6 +595,7 @@ public class InvadersTest {
                     {new String[]{"--text", "--width", "5", "--height", "X", "--border", "2"}},
                     {new String[]{"--text", "--width", "5", "--height", "5", "--border", "X"}},
                     {new String[]{"--png", "--scale", "X"}},
+                    {new String[]{"--png", "--seed", "X"}},
                     {new String[]{"--png", "--width", "5"}},
                     {new String[]{"--png", "--height", "5"}},
                     {new String[]{"--png", "--border", "5"}},
@@ -594,6 +611,30 @@ public class InvadersTest {
             final Invaders.Params params = Invaders.parseParams(this.args);
             // Verify
             assertNull(params);
+        }
+    }
+
+    public static class SeedTest {
+        @Test
+        public void seedParamShouldBeSetAsSeed() {
+            // Set up
+            Random random = mock(Random.class);
+            // Exercise
+            Invaders.Params params = new Invaders.Params(Invaders.Params.Format.Image, 0, 0, 0, 0, 42L);
+            Invaders.seed(random, params);
+            // Verify
+            verify(random).setSeed(42L);
+        }
+
+        @Test
+        public void nullSeedParamShouldBeIgnored() {
+            // Set up
+            Random random = mock(Random.class);
+            // Exercise
+            Invaders.Params params = new Invaders.Params(Invaders.Params.Format.Image, 0, 0, 0, 0, null);
+            Invaders.seed(random, params);
+            // Verify
+            verify(random, never()).setSeed(anyLong());
         }
     }
 
