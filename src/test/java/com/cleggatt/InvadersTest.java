@@ -1,5 +1,10 @@
 package com.cleggatt;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.stub;
+
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -11,12 +16,19 @@ import java.awt.image.BufferedImage;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Enclosed.class)
 public class InvadersTest {
+
+    private static Random greenRandom() {
+        final Random mock = mock(Random.class);
+        stub(mock.nextInt(Invaders.COLORS.length)).toReturn(5);
+        return(mock);
+    }
 
     @RunWith(Parameterized.class)
     public static class GetPixelsTest {
@@ -82,11 +94,11 @@ public class InvadersTest {
         @Test
         public void testGetTextInvader() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
-            final Invaders invaders = new Invaders(width, height, 1, random);
+            SecureRandom random = mock(SecureRandom.class);
+            final Invaders invaders = new Invaders(width, height, 1, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(invader, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final String textInvader = invaders.getTextInvaders(1, 1, 0);
@@ -99,11 +111,11 @@ public class InvadersTest {
         @Test
         public void square() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
-            final Invaders invaders = new Invaders(2, 2, 2, random);
+            SecureRandom random = mock(SecureRandom.class);
+            final Invaders invaders = new Invaders(2, 2, 2, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final String textInvader = invaders.getTextInvaders(1, 1, 0);
@@ -121,11 +133,11 @@ public class InvadersTest {
         @Test
         public void nonSquare() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
-            final Invaders invaders = new Invaders(2, 3, 2, random);
+            SecureRandom random = mock(SecureRandom.class);
+            final Invaders invaders = new Invaders(2, 3, 2, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final String textInvader = invaders.getTextInvaders(1, 1, 0);
@@ -148,12 +160,12 @@ public class InvadersTest {
         @Test
         public void square() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 2, 1, random);
+            final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
@@ -171,12 +183,12 @@ public class InvadersTest {
         @Test
         public void nonSquare() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 3, 1, random);
+            final Invaders invaders = new Invaders(2, 3, 1, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
@@ -198,12 +210,12 @@ public class InvadersTest {
         @Test
         public void square() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 2, 2, random);
+            final Invaders invaders = new Invaders(2, 2, 2, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b0110, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
@@ -236,12 +248,12 @@ public class InvadersTest {
         @Test
         public void nonSquare() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 3, 2, random);
+            final Invaders invaders = new Invaders(2, 3, 2, random, greenRandom());
 
             double value = getRandomDoubleToGenerate(0b100110, invaders.getMaxValue());
-            Mockito.stub(random.nextDouble()).toReturn(value);
+            stub(random.nextDouble()).toReturn(value);
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
@@ -287,15 +299,15 @@ public class InvadersTest {
         @Test
         public void text() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 2, 1, random);
+            final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
             double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
             double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
             double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
             double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
-            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+            when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
 
             // Exercise
             final String textInvader = invaders.getTextInvaders(2, 2, 0);
@@ -313,36 +325,40 @@ public class InvadersTest {
         @Test
         public void image() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
+            Random colourRandom = mock(Random.class);
 
-            final Invaders invaders = new Invaders(2, 2, 1, random);
+            final Invaders invaders = new Invaders(2, 2, 1, random, colourRandom);
 
             double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
             double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
             double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
             double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
-            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+            when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+
+            when(colourRandom.nextInt(Invaders.COLORS.length)).thenReturn(1, 5, 8, 2);
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(2, 2, 0);
 
             // Verify
             final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
-            expected.setRGB(0, 0, Color.GREEN.getRGB());
-            expected.setRGB(3, 0, Color.GREEN.getRGB());
 
-            expected.setRGB(5, 0, Color.GREEN.getRGB());
-            expected.setRGB(6, 0, Color.GREEN.getRGB());
+            expected.setRGB(0, 0, Invaders.COLORS[1].getRGB());
+            expected.setRGB(3, 0, Invaders.COLORS[1].getRGB());
 
-            expected.setRGB(0, 2, Color.GREEN.getRGB());
-            expected.setRGB(3, 2, Color.GREEN.getRGB());
-            expected.setRGB(1, 3, Color.GREEN.getRGB());
-            expected.setRGB(2, 3, Color.GREEN.getRGB());
+            expected.setRGB(5, 0, Invaders.COLORS[5].getRGB());
+            expected.setRGB(6, 0, Invaders.COLORS[5].getRGB());
 
-            expected.setRGB(5, 2, Color.GREEN.getRGB());
-            expected.setRGB(6, 2, Color.GREEN.getRGB());
-            expected.setRGB(5, 3, Color.GREEN.getRGB());
-            expected.setRGB(6, 3, Color.GREEN.getRGB());
+            expected.setRGB(0, 2, Invaders.COLORS[8].getRGB());
+            expected.setRGB(3, 2, Invaders.COLORS[8].getRGB());
+            expected.setRGB(1, 3, Invaders.COLORS[8].getRGB());
+            expected.setRGB(2, 3, Invaders.COLORS[8].getRGB());
+
+            expected.setRGB(5, 2, Invaders.COLORS[2].getRGB());
+            expected.setRGB(6, 2, Invaders.COLORS[2].getRGB());
+            expected.setRGB(5, 3, Invaders.COLORS[2].getRGB());
+            expected.setRGB(6, 3, Invaders.COLORS[2].getRGB());
 
             assertImageEquals(expected, image);
         }
@@ -354,15 +370,15 @@ public class InvadersTest {
         @Test
         public void text() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 2, 1, random);
+            final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
             double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
             double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
             double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
             double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
-            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+            when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
 
             // Exercise
             final String textInvader = invaders.getTextInvaders(2, 2, 2);
@@ -384,15 +400,15 @@ public class InvadersTest {
         @Test
         public void scaledText() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 2, 2, random);
+            final Invaders invaders = new Invaders(2, 2, 2, random, greenRandom());
 
             double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
             double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
             double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
             double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
-            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+            when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
 
             // Exercise
             final String textInvader = invaders.getTextInvaders(2, 2, 2);
@@ -418,15 +434,15 @@ public class InvadersTest {
         @Test
         public void image() {
             // Set up
-            SecureRandom random = Mockito.mock(SecureRandom.class);
+            SecureRandom random = mock(SecureRandom.class);
 
-            final Invaders invaders = new Invaders(2, 2, 1, random);
+            final Invaders invaders = new Invaders(2, 2, 1, random, greenRandom());
 
             double valueOne = getRandomDoubleToGenerate(0b0001, invaders.getMaxValue());
             double valueTwo = getRandomDoubleToGenerate(0b0010, invaders.getMaxValue());
             double valueThree = getRandomDoubleToGenerate(0b1001, invaders.getMaxValue());
             double valueFour = getRandomDoubleToGenerate(0b1010, invaders.getMaxValue());
-            Mockito.when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
+            when(random.nextDouble()).thenReturn(valueOne, valueTwo, valueThree, valueFour);
 
             // Exercise
             final BufferedImage image = invaders.getImageInvaders(2, 2, 2);

@@ -9,10 +9,26 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Random;
 
 public class Invaders {
 
-    private final SecureRandom random;
+    static Color[] COLORS = new Color[]{
+            Color.red,
+            Color.lightGray,
+            Color.pink,
+            Color.orange,
+            Color.yellow,
+            Color.green,
+            Color.magenta,
+            Color.cyan,
+            Color.blue
+    };
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    private final SecureRandom invaderRandom;
+    private final Random colourRandom;
     private final int width;
     private final int height;
     private final int scale;
@@ -29,15 +45,16 @@ public class Invaders {
      * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
      */
     public Invaders(int width, int height, int scale) {
-        this(width, height, scale, new SecureRandom());
+        this(width, height, scale, RANDOM, RANDOM);
     }
 
     /**
      * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
      */
     // We use SecureRandom to ensure we get the full range of long values (which won't be returned by Random)
-    Invaders(int width, int height, int scale, SecureRandom random) {
-        this.random = random;
+    Invaders(int width, int height, int scale, SecureRandom invaderRandom, Random colourRandom) {
+        this.invaderRandom = invaderRandom;
+        this.colourRandom = colourRandom;
         this.width = width;
         this.height = height;
         this.scale = scale;
@@ -49,7 +66,7 @@ public class Invaders {
     }
 
     private long generateInvader(boolean verbose) {
-        final long invader = (long) (random.nextDouble() * maxValue) + 1;
+        final long invader = (long)(invaderRandom.nextDouble() * maxValue) + 1;
         if (verbose) {
             System.out.print(String.format("Invader %d of %d\n", invader, getMaxValue()));
         }
@@ -75,23 +92,30 @@ public class Invaders {
     }
 
     private interface InvaderCanvas<T> {
-        void drawPixel(int x, int y);
+        void drawPixel(int x, int y, int colour);
         T getInvader();
     }
 
-    private void drawScaledPixel(final int x, final int y, final int xOffset, final int yOffset, InvaderCanvas canvas) {
+    private Color getColor() {
+        return COLORS[colourRandom.nextInt(COLORS.length)];
+    }
+
+    private void drawScaledPixel(final int x, final int y, final int xOffset, final int yOffset, final int colour, InvaderCanvas canvas) {
         for (int scaledY = (y * scale); scaledY < ((y * scale)) + scale; scaledY++) {
             for (int scaledX = (x * scale); scaledX < ((x * scale)) + scale; scaledX++) {
-                canvas.drawPixel(xOffset + scaledX, yOffset + scaledY);
+                canvas.drawPixel(xOffset + scaledX, yOffset + scaledY, colour);
             }
         }
     }
 
     private void renderInvader(boolean[][] pixels, InvaderCanvas canvas, final int xOffset, final int yOffset) {
+
+        final int colour = getColor().getRGB();
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < (width * 2); x++) {
                 if (pixels[y][x]) {
-                    drawScaledPixel(x, y, xOffset, yOffset, canvas);
+                    drawScaledPixel(x, y, xOffset, yOffset, colour, canvas);
                 }
             }
         }
@@ -150,7 +174,7 @@ public class Invaders {
         }
 
         @Override
-        public void drawPixel(final int x, final int y) {
+        public void drawPixel(final int x, final int y, final int colour) {
             int pos = 0;
             pos = pos + (y * lineWidth); // Number of lines down
             pos = pos + y; // Allow for line feeds
@@ -164,11 +188,13 @@ public class Invaders {
         }
     }
 
-    private class ImageCanvas implements InvaderCanvas<BufferedImage> {
+    private static class ImageCanvas implements InvaderCanvas<BufferedImage> {
 
+        private final SecureRandom random;
         private final BufferedImage image;
 
-        private ImageCanvas(int width, int height, int scale, int numWide, int numHigh, int border) {
+        private ImageCanvas(SecureRandom random, int width, int height, int scale, int numWide, int numHigh, int border) {
+            this.random = random;
             int imageWidth = (width * 2 * numWide * scale) + ((numWide - 1) * border);
             int imageHeight = (height * numHigh * scale) + ((numHigh - 1) * border);
 
@@ -176,8 +202,8 @@ public class Invaders {
         }
 
         @Override
-        public void drawPixel(int x, int y) {
-            image.setRGB(x, y, Color.GREEN.getRGB());
+        public void drawPixel(int x, int y, int colour) {
+            image.setRGB(x, y, colour);
         }
 
         @Override
@@ -191,11 +217,10 @@ public class Invaders {
     }
 
     public BufferedImage getImageInvaders(final int numWide, final int numHigh, final int border) {
-        return getInvaders(numWide, numHigh, border, new ImageCanvas(width, height, scale, numWide, numHigh, border));
+        return getInvaders(numWide, numHigh, border, new ImageCanvas(invaderRandom, width, height, scale, numWide, numHigh, border));
     }
 
     private static Options options = new Options();
-
     static {
         options.addOption("t", "text", false, "generate invader as text");
         options.addOption("p", "png", false, "generate invader as PNG");
