@@ -20,7 +20,9 @@ public class Invaders {
     private final int scale;
     private final long maxValue;
 
-    // TODO Comment width is doubled!
+    /**
+     * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
+     */
     public Invaders(int width, int height) {
         this(width, height, 1);
     }
