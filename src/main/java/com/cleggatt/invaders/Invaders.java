@@ -1,6 +1,7 @@
 package com.cleggatt.invaders;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.math.BigInteger;
 import java.util.Random;
@@ -176,6 +177,10 @@ public class Invaders {
             int imageHeight = (height * numHigh * scale) + (numHigh * border * 2);
 
             image = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D graphics = image.createGraphics();
+            graphics.setPaint(Color.black);
+            graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
         }
 
         @Override

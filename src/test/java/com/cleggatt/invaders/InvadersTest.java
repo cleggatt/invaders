@@ -6,6 +6,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.Collection;
@@ -164,7 +165,7 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(4, 2, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage expected = createBlackImage(4, 2);
             expected.setRGB(1, 0, Color.GREEN.getRGB());
             expected.setRGB(2, 0, Color.GREEN.getRGB());
             expected.setRGB(0, 1, Color.GREEN.getRGB());
@@ -187,7 +188,7 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(4, 3, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage expected = createBlackImage(4, 3);
             expected.setRGB(1, 0, Color.GREEN.getRGB());
             expected.setRGB(2, 0, Color.GREEN.getRGB());
             expected.setRGB(0, 1, Color.GREEN.getRGB());
@@ -214,7 +215,7 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage expected = createBlackImage(8, 4);
             expected.setRGB(2, 0, Color.GREEN.getRGB());
             expected.setRGB(3, 0, Color.GREEN.getRGB());
             expected.setRGB(4, 0, Color.GREEN.getRGB());
@@ -252,7 +253,7 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(1, 1, 0);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(8, 6, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage expected = createBlackImage(8, 6);
             expected.setRGB(2, 0, Color.GREEN.getRGB());
             expected.setRGB(3, 0, Color.GREEN.getRGB());
             expected.setRGB(4, 0, Color.GREEN.getRGB());
@@ -335,7 +336,7 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(2, 2, 0);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(8, 4, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage expected = createBlackImage(8, 4);
 
             expected.setRGB(0, 0, Invaders.COLORS[1].getRGB());
             expected.setRGB(3, 0, Invaders.COLORS[1].getRGB());
@@ -457,7 +458,7 @@ public class InvadersTest {
             final BufferedImage image = invaders.getImageInvaders(2, 2, 2);
 
             // Verify
-            final BufferedImage expected = new BufferedImage(16, 12, BufferedImage.TYPE_INT_ARGB);
+            final BufferedImage expected = createBlackImage(16, 12);
             expected.setRGB(2, 2, Color.GREEN.getRGB());
             expected.setRGB(5, 2, Color.GREEN.getRGB());
 
@@ -480,6 +481,16 @@ public class InvadersTest {
 
     private static double getRandomDoubleToGenerate(long desiredValue, long maxValue ) {
         return (((double) desiredValue) - 1) / maxValue;
+    }
+
+    private static BufferedImage createBlackImage(int width, int height) {
+        BufferedImage image = new BufferedImage(width, height,  BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D graphics = image.createGraphics();
+        graphics.setPaint(Color.black);
+        graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
+
+        return image;
     }
 
     private static void assertImageEquals(BufferedImage expected, BufferedImage actual) {
