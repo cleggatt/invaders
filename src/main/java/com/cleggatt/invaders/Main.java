@@ -2,6 +2,7 @@ package com.cleggatt.invaders;
 
 
 import org.apache.commons.cli.*;
+import org.jdesktop.swingx.image.GaussianBlurFilter;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -15,8 +16,11 @@ public final class Main {
     static final int DEFAULT_X = 4;
     private static final String DEFAULT_X_STR = String.valueOf(DEFAULT_X);
     // @VisibleForTesting
-    static final int DEFAULT_Y = 8;
+    static final int DEFAULT_Y = 6;
     private static final String DEFAULT_Y_STR = String.valueOf(DEFAULT_Y);
+    // @VisibleForTesting
+    static final int DEFAULT_BLUR = 3;
+    private static final String DEFAULT_BLUR_STR = String.valueOf(DEFAULT_BLUR);
 
     private Main() {
     }
@@ -37,6 +41,8 @@ public final class Main {
         options.addOption("b", "border", true, "border width for a tile (default: 0)");
 
         options.addOption("seed", true, "random seed for tile generation");
+
+        options.addOption("guassian", true, String.format("guassian blur radius (image only, default: %d)", DEFAULT_BLUR));
     }
 
     // @VisibleForTesting
@@ -53,6 +59,7 @@ public final class Main {
         private final int numHigh;
         private final int border;
         private final Long seed;
+        private final int blurRadius;
 
         Format getFormat() {
             return format;
@@ -82,11 +89,15 @@ public final class Main {
             return border;
         }
 
-        public Long getSeed() {
+        Long getSeed() {
             return seed;
         }
 
-        Params(Format format, int x, int y, int scale, int numWide, int numHigh, int border, Long seed) {
+        int getBlurRadius() {
+            return blurRadius;
+        }
+
+        Params(Format format, int x, int y, int scale, int numWide, int numHigh, int border, Long seed, int blurRadius) {
             this.x = x;
             this.y = y;
             this.format = format;
@@ -95,6 +106,7 @@ public final class Main {
             this.numHigh = numHigh;
             this.border = border;
             this.seed = seed;
+            this.blurRadius = blurRadius;
         }
     }
 
@@ -126,6 +138,7 @@ public final class Main {
             return null;
         }
 
+        // TODO Validate X and Y are less than a long
         Long seed = null;
         if (cmd.hasOption("seed")) {
             try {
@@ -136,19 +149,27 @@ public final class Main {
         }
 
         Params.Format fmt;
+        int blurRadius = 0;
 
         if (cmd.hasOption('t')) {
-            if (cmd.hasOption('p')) {
+            if (cmd.hasOption('p') || cmd.hasOption("guassian")) {
                 return null;
             }
             fmt = Params.Format.Text;
         } else if (cmd.hasOption('p')) {
             fmt = Params.Format.Image;
+
+            try {
+                blurRadius = Integer.parseInt(cmd.getOptionValue("guassian", DEFAULT_BLUR_STR));
+
+            } catch (NumberFormatException e) {
+                return null;
+            }
         } else {
             return null;
         }
 
-        return new Params(fmt, x, y, scale, width, height, border, seed);
+        return new Params(fmt, x, y, scale, width, height, border, seed, blurRadius);
     }
 
     // @VisibleForTesting
@@ -157,6 +178,13 @@ public final class Main {
             random.setSeed(params.getSeed());
         }
         return random;
+    }
+
+    static BufferedImage blur(BufferedImage src, int blurRadius) {
+        BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        GaussianBlurFilter gaussianFilter = new GaussianBlurFilter(blurRadius);
+        gaussianFilter.filter(src, dst);
+        return dst;
     }
 
     public static void main(String[] args) {
@@ -174,7 +202,7 @@ public final class Main {
                 System.out.println(invader.getTextInvaders(params.getNumWide(), params.getNumWide(), params.getBorder()));
                 break;
             case Image:
-                final BufferedImage image = invader.getImageInvaders(params.getNumWide(), params.getNumWide(), params.getBorder());
+                final BufferedImage image = blur(invader.getImageInvaders(params.getNumWide(), params.getNumWide(), params.getBorder()), params.getBlurRadius());
                 final File output = new File("invader.png");
                 try {
                     ImageIO.write(image, "PNG", output);

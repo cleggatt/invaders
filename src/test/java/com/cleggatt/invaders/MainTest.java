@@ -15,8 +15,7 @@ import com.cleggatt.invaders.Main.Params.Format;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.*;
-import static com.cleggatt.invaders.Main.DEFAULT_X;
-import static com.cleggatt.invaders.Main.DEFAULT_Y;
+import static com.cleggatt.invaders.Main.*;
 
 @RunWith(Enclosed.class)
 public class MainTest {
@@ -35,22 +34,23 @@ public class MainTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
-                    {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null)},
-                    {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null)},
-                    {new String[]{"--text", "--height", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 0, null)},
-                    {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 0, null)},
-                    {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 11L)},
-                    {new String[]{"--text", "--width", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 0, null)},
-                    {new String[]{"--text", "-x", "13"}, new Params(Format.Text, 13, DEFAULT_Y, 1, 1, 1, 0, null)},
-                    {new String[]{"--text", "-y", "14"}, new Params(Format.Text, DEFAULT_X, 14, 1, 1, 1, 0, null)},
-                    {new String[]{"--png"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null)},
-                    {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null)},
-                    {new String[]{"--png", "--height", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 16, 0, null)},
-                    {new String[]{"--png", "--scale", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 17, 1, 1, 0, null)},
-                    {new String[]{"--png", "--seed", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 18L)},
-                    {new String[]{"--png", "--width", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 19, 1, 0, null)},
-                    {new String[]{"--png", "-x", "20"}, new Params(Format.Image, 20, DEFAULT_Y, 1, 1, 1, 0, null)},
-                    {new String[]{"--png", "-y", "21"}, new Params(Format.Image, DEFAULT_X, 21, 1, 1, 1, 0, null)},
+                    {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null, 0)},
+                    {new String[]{"--text", "--height", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 0, null, 0)},
+                    {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 11L, 0)},
+                    {new String[]{"--text", "--width", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 0, null, 0)},
+                    {new String[]{"--text", "-x", "13"}, new Params(Format.Text, 13, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "-y", "14"}, new Params(Format.Text, DEFAULT_X, 14, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--png"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--guassian", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 16)},
+                    {new String[]{"--png", "--height", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--seed", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 19L, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--width", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "-x", "21"}, new Params(Format.Image, 21, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "-y", "22"}, new Params(Format.Image, DEFAULT_X, 22, 1, 1, 1, 0, null, DEFAULT_BLUR)},
             });
         }
 
@@ -68,6 +68,7 @@ public class MainTest {
             assertEquals(expected.getNumHigh(), params.getNumHigh());
             assertEquals(expected.getBorder(), params.getBorder());
             assertEquals(expected.getSeed(), params.getSeed());
+            assertEquals(expected.getBlurRadius(), params.getBlurRadius());
         }
     }
 
@@ -85,6 +86,7 @@ public class MainTest {
             return Arrays.asList(new Object[][]{
                     {new String[]{"-x"}},
                     {new String[]{"--border"}},
+                    {new String[]{"--guassian"}},
                     {new String[]{"--height"}},
                     {new String[]{"--scale"}},
                     {new String[]{"--seed"}},
@@ -92,27 +94,30 @@ public class MainTest {
                     {new String[]{"-x"}},
                     {new String[]{"-y"}},
                     {new String[]{"--border", "11"}},
-                    {new String[]{"--height", "12"}},
-                    {new String[]{"--scale", "13"}},
-                    {new String[]{"--seed", "14"}},
-                    {new String[]{"--width", "15"}},
-                    {new String[]{"-x", "16"}},
-                    {new String[]{"-y", "17"}},
+                    {new String[]{"--guassian", "12"}},
+                    {new String[]{"--height", "13"}},
+                    {new String[]{"--scale", "14"}},
+                    {new String[]{"--seed", "15"}},
+                    {new String[]{"--width", "16"}},
+                    {new String[]{"-x", "17"}},
+                    {new String[]{"-y", "18"}},
                     {new String[]{"--text", "--png"}},
-                    {new String[]{"--text", "--border", "C"}},
-                    {new String[]{"--text", "--height", "d"}},
-                    {new String[]{"--text", "--scale", "E"}},
-                    {new String[]{"--text", "--seed", "f"}},
-                    {new String[]{"--text", "--width", "G"}},
-                    {new String[]{"--text", "-x", "h"}},
-                    {new String[]{"--text", "-y", "I"}},
-                    {new String[]{"--png", "--border", "j"}},
-                    {new String[]{"--png", "--height", "K"}},
-                    {new String[]{"--png", "--scale", "l"}},
-                    {new String[]{"--png", "--seed", "M"}},
-                    {new String[]{"--png", "--width", "n"}},
-                    {new String[]{"--png", "-x", "O"}},
-                    {new String[]{"--png", "-y", "Ip"}},
+                    {new String[]{"--text", "--guassian", "1"}},
+                    {new String[]{"--text", "--border", "a"}},
+                    {new String[]{"--text", "--height", "B"}},
+                    {new String[]{"--text", "--scale", "c"}},
+                    {new String[]{"--text", "--seed", "D"}},
+                    {new String[]{"--text", "--width", "e"}},
+                    {new String[]{"--text", "-x", "f"}},
+                    {new String[]{"--text", "-y", "G"}},
+                    {new String[]{"--png", "--border", "h"}},
+                    {new String[]{"--png", "--guassian", "I"}},
+                    {new String[]{"--png", "--height", "j"}},
+                    {new String[]{"--png", "--scale", "K"}},
+                    {new String[]{"--png", "--seed", "l"}},
+                    {new String[]{"--png", "--width", "M"}},
+                    {new String[]{"--png", "-x", "n"}},
+                    {new String[]{"--png", "-y", "O"}},
             });
         }
 
@@ -131,7 +136,7 @@ public class MainTest {
             // Set up
             Random random = mock(Random.class);
             // Exercise
-            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y,0, 0, 0, 0, 42L);
+            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 0, 0, 0, 0, 42L, 0);
             Main.seed(random, params);
             // Verify
             verify(random).setSeed(42L);
@@ -142,7 +147,7 @@ public class MainTest {
             // Set up
             Random random = mock(Random.class);
             // Exercise
-            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y,0, 0, 0, 0, null);
+            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y,0, 0, 0, 0, null, 0);
             Main.seed(random, params);
             // Verify
             verify(random, never()).setSeed(anyLong());

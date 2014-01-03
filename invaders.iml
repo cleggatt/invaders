@@ -38,6 +38,9 @@
     <orderEntry type="library" scope="TEST" name="Gradle: xmlParserAPIs-2.6.2" level="project" />
     <orderEntry type="library" exported="" name="Gradle: commons-cli-1.2" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: mockito-all-1.9.5" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: swingx-1.6.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: swing-worker-1.1" level="project" />
+    <orderEntry type="library" exported="" name="Gradle: filters-2.0.235" level="project" />
   </component>
 </module>
 
