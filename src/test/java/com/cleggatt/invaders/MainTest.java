@@ -40,8 +40,8 @@ public class MainTest {
                     {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 11L, 0)},
                     {new String[]{"--text", "--width", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 0, null, 0)},
-                    {new String[]{"--text", "-x", "13"}, new Params(Format.Text, 13, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
-                    {new String[]{"--text", "-y", "14"}, new Params(Format.Text, DEFAULT_X, 14, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "-x", "2"}, new Params(Format.Text, 2, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "-y", "3"}, new Params(Format.Text, DEFAULT_X, 3, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--png"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "--guassian", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 16)},
@@ -49,8 +49,8 @@ public class MainTest {
                     {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "--seed", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 19L, DEFAULT_BLUR)},
                     {new String[]{"--png", "--width", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 0, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "-x", "21"}, new Params(Format.Image, 21, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "-y", "22"}, new Params(Format.Image, DEFAULT_X, 22, 1, 1, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "-x", "4"}, new Params(Format.Image, 4, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "-y", "5"}, new Params(Format.Image, DEFAULT_X, 5, 1, 1, 1, 0, null, DEFAULT_BLUR)},
             });
         }
 
@@ -117,7 +117,7 @@ public class MainTest {
                     {new String[]{"--png", "--seed", "l"}},
                     {new String[]{"--png", "--width", "M"}},
                     {new String[]{"--png", "-x", "n"}},
-                    {new String[]{"--png", "-y", "O"}},
+                    {new String[]{"--png", "-y", "P"}},
             });
         }
 
@@ -127,6 +127,24 @@ public class MainTest {
             final Params params = Main.parseParams(this.args);
             // Verify
             assertNull(params);
+        }
+    }
+
+    public static class InvaderDimensionTest {
+        @Test
+        public void productOfXAndYGreaterThan63ShouldBeInvalid() {
+            // Exercise
+            final Params params = Main.parseParams(new String[]{"--png", "-x", "2", "-y", "32"});
+            // Verify
+            assertNull(params);
+        }
+
+        @Test
+        public void productOfXAndYGreaterLessThan63ShouldBeValid() {
+            // Exercise
+            final Params params = Main.parseParams(new String[]{"--png", "-x", "2", "-y", "31"});
+            // Verify
+            assertNotNull(params);
         }
     }
 

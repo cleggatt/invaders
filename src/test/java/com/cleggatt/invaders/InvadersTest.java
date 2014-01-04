@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Random;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 import static org.mockito.Mockito.*;
 
 @RunWith(Enclosed.class)
@@ -22,6 +23,20 @@ public class InvadersTest {
         final Random mock = mock(Random.class);
         stub(mock.nextInt(Invaders.COLORS.length)).toReturn(5);
         return(mock);
+    }
+
+    public static class ConstructorTest {
+        @Test(expected = IllegalArgumentException.class)
+        public void productOfWidthAndHeightGreaterThan63ShouldThrowIllegalArgumentException() {
+            // Exercise (and verify by exception)
+            new Invaders(2, 32, 1, mock(Random.class), mock(Random.class));
+        }
+
+        @Test
+        public void productOfWidthAndHeightGreaterLessThan63ShouldBeValid() {
+            // Exercise (and verify by lack of exception)
+            new Invaders(2, 31, 1, mock(Random.class), mock(Random.class));
+        }
     }
 
     @RunWith(Parameterized.class)

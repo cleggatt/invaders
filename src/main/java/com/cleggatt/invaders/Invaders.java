@@ -31,6 +31,11 @@ public class Invaders {
      * @param width the width of the randomly generated tile. This is <b>half</b> the width of the final tile.
      */
     public Invaders(int width, int height, int scale, Random invaderRandom, Random colourRandom) {
+
+        if (width * height > 62) {
+            throw new IllegalArgumentException("The product of the 'width' and 'height' arguments must be less than 63");
+        }
+
         this.invaderRandom = invaderRandom;
         this.colourRandom = colourRandom;
         this.width = width;

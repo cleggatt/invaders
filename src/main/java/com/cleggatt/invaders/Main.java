@@ -138,7 +138,11 @@ public final class Main {
             return null;
         }
 
-        // TODO Validate X and Y are less than a long
+        if (x * y > 62) {
+            System.err.println("The product of the 'x' and 'y' arguments must be less than 63");
+            return null;
+        }
+
         Long seed = null;
         if (cmd.hasOption("seed")) {
             try {
