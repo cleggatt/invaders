@@ -26,7 +26,10 @@ public final class Main {
     }
 
     private static Options options = new Options();
+
     static {
+        options.addOption("help", false, "display this help and exit");
+
         options.addOption("t", "text", false, "generate as text");
         options.addOption("p", "png", false, "generate as PNG");
 
@@ -110,70 +113,114 @@ public final class Main {
         }
     }
 
+    private static class InvaderCommandLine {
+
+        private final CommandLine cmd;
+
+        private InvaderCommandLine(String[] args) throws ParseException {
+            try {
+                cmd = new BasicParser().parse(options, args);
+            } catch (ParseException e) {
+                throw new ParseException(optErr(e.getMessage()));
+            }
+        }
+
+        private int getInt(char option, String defaultValue) throws ParseException {
+            final String argument = cmd.getOptionValue(option, defaultValue);
+            try {
+                return Integer.parseInt(argument);
+            } catch (NumberFormatException e) {
+                throw new ParseException(argErr(option, argument));
+            }
+        }
+
+        private int getInt(String option, String defaultValue) throws ParseException {
+            final String argument = cmd.getOptionValue(option, defaultValue);
+            try {
+                return Integer.parseInt(argument);
+            } catch (NumberFormatException e) {
+                throw new ParseException(argErr(option, argument));
+            }
+        }
+
+        private Long getLong(String option) throws ParseException {
+            final String argument = cmd.getOptionValue(option);
+            try {
+                return Long.parseLong(argument);
+            } catch (NumberFormatException e) {
+                throw new ParseException(argErr(option, argument));
+            }
+        }
+
+        private boolean hasOption(char opt) {
+            return cmd.hasOption(opt);
+        }
+
+        private boolean hasOption(String opt) {
+            return cmd.hasOption(opt);
+        }
+    }
+
     // @VisibleForTesting
-    static Params parseParams(String[] args) {
+    static Params parseParams(String[] args) throws ParseException {
 
-        CommandLineParser parser = new BasicParser();
-        CommandLine cmd;
-        try {
-            cmd = parser.parse(options, args);
-        } catch (ParseException e) {
+        InvaderCommandLine cmd = new InvaderCommandLine(args);
+
+        if (cmd.hasOption("help")) {
             return null;
         }
 
-        int x;
-        int y;
-        int scale;
-        int width;
-        int height;
-        int border;
-        try {
-            x = Integer.parseInt(cmd.getOptionValue('x', DEFAULT_X_STR));
-            y = Integer.parseInt(cmd.getOptionValue('y', DEFAULT_Y_STR));
-            scale = Integer.parseInt(cmd.getOptionValue('s', "1"));
-            width = Integer.parseInt(cmd.getOptionValue('w', "1"));
-            height = Integer.parseInt(cmd.getOptionValue('h', "1"));
-            border = Integer.parseInt(cmd.getOptionValue('b', "0"));
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        int x = cmd.getInt('x', DEFAULT_X_STR);
+        int y = cmd.getInt('y', DEFAULT_Y_STR);
+        int scale = cmd.getInt('s', "1");
+        int width = cmd.getInt('w', "1");
+        int height = cmd.getInt('h', "1");
+        int border = cmd.getInt('b', "0");
 
         if (x * y > 62) {
-            System.err.println("The product of the 'x' and 'y' arguments must be less than 63");
-            return null;
+            throw new ParseException(err("invalid arguments for '-x' and '-y'\nTheir products must be less than 63"));
         }
 
         Long seed = null;
         if (cmd.hasOption("seed")) {
-            try {
-                seed = Long.parseLong(cmd.getOptionValue("seed"));
-            } catch (NumberFormatException e) {
-                return null;
-            }
+            seed = cmd.getLong("seed");
         }
 
         Params.Format fmt;
         int blurRadius = 0;
 
         if (cmd.hasOption('t')) {
-            if (cmd.hasOption('p') || cmd.hasOption("guassian")) {
-                return null;
+            if (cmd.hasOption('p')) {
+                throw new ParseException(optErr("Option 'png' cannot be specified with option 'text'"));
+            }
+            if (cmd.hasOption("guassian")) {
+                throw new ParseException(optErr("Option 'guassian' cannot be specified with option 'text'"));
             }
             fmt = Params.Format.Text;
         } else if (cmd.hasOption('p')) {
             fmt = Params.Format.Image;
-
-            try {
-                blurRadius = Integer.parseInt(cmd.getOptionValue("guassian", DEFAULT_BLUR_STR));
-
-            } catch (NumberFormatException e) {
-                return null;
-            }
+            blurRadius = cmd.getInt("guassian", DEFAULT_BLUR_STR);
         } else {
-            return null;
+            throw new ParseException(optErr("Option 'text' or option 'png' must be specified"));
         }
 
         return new Params(fmt, x, y, scale, width, height, border, seed, blurRadius);
+    }
+
+    static String optErr(String err) {
+        return err(String.format("invalid option -- %s", err));
+    }
+
+    static String argErr(char opt, String arg) {
+        return err(String.format("invalid argument '%s' for '-%c'", arg, opt));
+    }
+
+    static String argErr(String opt, String arg) {
+        return err(String.format("invalid argument '%s' for '--%s'", arg, opt));
+    }
+
+    static String err(String err) {
+        return String.format("invaders: %s\nTry 'invaders --help' for more information.", err);
     }
 
     // @VisibleForTesting
@@ -193,10 +240,16 @@ public final class Main {
 
     public static void main(String[] args) {
 
-        Params params = parseParams(args);
-        if (params == null) {
-            new HelpFormatter().printHelp("Invaders", options);
+        Params params = null;
+        try {
+            params = parseParams(args);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
             System.exit(1);
+        }
+        if (params == null) {
+            new HelpFormatter().printHelp("invaders", options, true);
+            System.exit(0);
         }
 
         final Invaders invader = new Invaders(params.getX(), params.getY(), params.getScale(), seed(new Random(), params), new Random());

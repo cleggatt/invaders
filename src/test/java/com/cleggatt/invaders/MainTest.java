@@ -1,5 +1,6 @@
 package com.cleggatt.invaders;
 
+import org.apache.commons.cli.ParseException;
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -55,7 +56,7 @@ public class MainTest {
         }
 
         @Test
-        public void testParseParams() {
+        public void testParseParams() throws ParseException {
             // Exercise
             final Params params = Main.parseParams(this.args);
             // Verify
@@ -84,6 +85,7 @@ public class MainTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
+                    {new String[]{}},
                     {new String[]{"-x"}},
                     {new String[]{"--border"}},
                     {new String[]{"--guassian"}},
@@ -121,30 +123,37 @@ public class MainTest {
             });
         }
 
-        @Test
-        public void testParseInvalidParams() {
-            // Exercise
-            final Params params = Main.parseParams(this.args);
-            // Verify
-            assertNull(params);
+        @Test(expected = ParseException.class)
+        public void testParseInvalidParams() throws ParseException {
+            // Exercise (and verify by exception)
+            Main.parseParams(this.args);
         }
     }
 
     public static class InvaderDimensionTest {
-        @Test
-        public void productOfXAndYGreaterThan63ShouldBeInvalid() {
-            // Exercise
-            final Params params = Main.parseParams(new String[]{"--png", "-x", "2", "-y", "32"});
-            // Verify
-            assertNull(params);
+        @Test(expected = ParseException.class)
+        public void productOfXAndYGreaterThan63ShouldBeInvalid() throws ParseException {
+            // Exercise (and verify by exception)
+            Main.parseParams(new String[]{"--png", "-x", "2", "-y", "32"});
         }
 
         @Test
-        public void productOfXAndYGreaterLessThan63ShouldBeValid() {
+        public void productOfXAndYGreaterLessThan63ShouldBeValid() throws ParseException {
             // Exercise
             final Params params = Main.parseParams(new String[]{"--png", "-x", "2", "-y", "31"});
             // Verify
             assertNotNull(params);
+        }
+    }
+
+
+    public static class HelpTextTest {
+        @Test
+        public void helpOptionShouldReturnNull() throws ParseException {
+            // Exercise
+            final Params params = Main.parseParams(new String[]{"--help"});
+            // Verify
+            assertNull(params);
         }
     }
 
