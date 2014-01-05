@@ -37,4 +37,5 @@ task wrapper(type: Wrapper) {
 
 task oneJar(type: OneJar) {
     mainClass = 'com.cleggatt.invaders.Main'
+    additionalDir = file('src/main/resources')
 }
