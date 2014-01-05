@@ -125,22 +125,27 @@ public final class Main {
             }
         }
 
-        private int getInt(char option, String defaultValue) throws ParseException {
-            final String argument = cmd.getOptionValue(option, defaultValue);
-            try {
-                return Integer.parseInt(argument);
-            } catch (NumberFormatException e) {
-                throw new ParseException(argErr(option, argument));
-            }
+        private int getInt(char option, int min, String defaultValue) throws ParseException {
+            return getIntArgument("-", String.valueOf(option), min, defaultValue);
+
         }
 
-        private int getInt(String option, String defaultValue) throws ParseException {
+        private int getInt(String option,  int min, String defaultValue) throws ParseException {
+            return getIntArgument("--", option, min, defaultValue);
+        }
+
+        private int getIntArgument(String prefix, String option, int min, String defaultValue) throws ParseException {
             final String argument = cmd.getOptionValue(option, defaultValue);
+            int value;
             try {
-                return Integer.parseInt(argument);
+                value = Integer.parseInt(argument);
             } catch (NumberFormatException e) {
-                throw new ParseException(argErr(option, argument));
+                throw new ParseException(argErr(prefix, option, argument));
             }
+            if (value < min) {
+                throw new ParseException(argErr(prefix, option, argument));
+            }
+            return value;
         }
 
         private Long getLong(String option) throws ParseException {
@@ -148,7 +153,7 @@ public final class Main {
             try {
                 return Long.parseLong(argument);
             } catch (NumberFormatException e) {
-                throw new ParseException(argErr(option, argument));
+                throw new ParseException(argErr("--", option, argument));
             }
         }
 
@@ -170,12 +175,12 @@ public final class Main {
             return null;
         }
 
-        int x = cmd.getInt('x', DEFAULT_X_STR);
-        int y = cmd.getInt('y', DEFAULT_Y_STR);
-        int scale = cmd.getInt('s', "1");
-        int width = cmd.getInt('w', "1");
-        int height = cmd.getInt('h', "1");
-        int border = cmd.getInt('b', "0");
+        int x = cmd.getInt('x', 1, DEFAULT_X_STR);
+        int y = cmd.getInt('y', 1, DEFAULT_Y_STR);
+        int scale = cmd.getInt('s', 1, "1");
+        int width = cmd.getInt('w', 1, "1");
+        int height = cmd.getInt('h', 1, "1");
+        int border = cmd.getInt('b', 0, "0");
 
         if (x * y > 62) {
             throw new ParseException(err("invalid arguments for '-x' and '-y'\nTheir products must be less than 63"));
@@ -199,7 +204,7 @@ public final class Main {
             fmt = Params.Format.Text;
         } else if (cmd.hasOption('p')) {
             fmt = Params.Format.Image;
-            blurRadius = cmd.getInt("guassian", DEFAULT_BLUR_STR);
+            blurRadius = cmd.getInt("guassian", 0, DEFAULT_BLUR_STR);
         } else {
             throw new ParseException(optErr("Option 'text' or option 'png' must be specified"));
         }
@@ -211,12 +216,8 @@ public final class Main {
         return err(String.format("invalid option -- %s", err));
     }
 
-    static String argErr(char opt, String arg) {
-        return err(String.format("invalid argument '%s' for '-%c'", arg, opt));
-    }
-
-    static String argErr(String opt, String arg) {
-        return err(String.format("invalid argument '%s' for '--%s'", arg, opt));
+    static String argErr(String prefix, String opt, String arg) {
+        return err(String.format("invalid argument '%s' for '%s%s'", arg, prefix, opt));
     }
 
     static String err(String err) {
@@ -259,7 +260,7 @@ public final class Main {
                 System.out.println(invader.getTextInvaders(params.getNumWide(), params.getNumWide(), params.getBorder()));
                 break;
             case Image:
-                final BufferedImage image = blur(invader.getImageInvaders(params.getNumWide(), params.getNumWide(), params.getBorder()), params.getBlurRadius());
+                final BufferedImage image = blur(invader.getImageInvaders(params.getNumWide(), params.getNumHigh(), params.getBorder()), params.getBlurRadius());
                 final File output = new File("invader.png");
                 try {
                     ImageIO.write(image, "PNG", output);

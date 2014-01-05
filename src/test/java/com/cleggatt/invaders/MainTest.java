@@ -36,19 +36,35 @@ public class MainTest {
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
                     {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+
+                    {new String[]{"--text", "--border", "0"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null, 0)},
+
+                    {new String[]{"--text", "--height", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--height", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 0, null, 0)},
+
+                    {new String[]{"--text", "--scale", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 0, null, 0)},
+
                     {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 11L, 0)},
+
+                    {new String[]{"--text", "--width", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--width", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 0, null, 0)},
+
+                    {new String[]{"--text", "-x", "1"}, new Params(Format.Text, 1, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "-x", "2"}, new Params(Format.Text, 2, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+
+                    {new String[]{"--text", "-y", "1"}, new Params(Format.Text, DEFAULT_X, 1, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "-y", "3"}, new Params(Format.Text, DEFAULT_X, 3, 1, 1, 1, 0, null, 0)},
+
                     {new String[]{"--png"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--guassian", "0"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--png", "--guassian", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 16)},
-                    {new String[]{"--png", "--height", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 0, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
+
+                    {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--height", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 0, null, DEFAULT_BLUR)},                  {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "--seed", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 19L, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "--width", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "-x", "4"}, new Params(Format.Image, 4, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "-y", "5"}, new Params(Format.Image, DEFAULT_X, 5, 1, 1, 1, 0, null, DEFAULT_BLUR)},
@@ -85,6 +101,7 @@ public class MainTest {
         @Parameterized.Parameters
         public static Collection primeNumbers() {
             return Arrays.asList(new Object[][]{
+                    // Invalid options without output specified
                     {new String[]{}},
                     {new String[]{"-x"}},
                     {new String[]{"--border"}},
@@ -103,8 +120,7 @@ public class MainTest {
                     {new String[]{"--width", "16"}},
                     {new String[]{"-x", "17"}},
                     {new String[]{"-y", "18"}},
-                    {new String[]{"--text", "--png"}},
-                    {new String[]{"--text", "--guassian", "1"}},
+                    //  Invalid arguments type
                     {new String[]{"--text", "--border", "a"}},
                     {new String[]{"--text", "--height", "B"}},
                     {new String[]{"--text", "--scale", "c"}},
@@ -120,13 +136,34 @@ public class MainTest {
                     {new String[]{"--png", "--width", "M"}},
                     {new String[]{"--png", "-x", "n"}},
                     {new String[]{"--png", "-y", "P"}},
+                    // Invalid option combinations
+                    {new String[]{"--text", "--png"}},
+                    {new String[]{"--text", "--guassian", "1"}},
+                    // Invalid option arguments values - use PNG as all options are valid for it
+                    {new String[]{"--png", "--border", "-1"}},
+                    {new String[]{"--png", "--guassian", "-1"}},
+                    {new String[]{"--png", "--height", "0"}},
+                    {new String[]{"--png", "--height", "-1"}},
+                    {new String[]{"--png", "--scale", "0"}},
+                    {new String[]{"--png", "--scale", "-1"}},
+                    {new String[]{"--png", "--width", "0"}},
+                    {new String[]{"--png", "--width", "-1"}},
+                    {new String[]{"--png", "-x", "0"}},
+                    {new String[]{"--png", "-x", "-1"}},
+                    {new String[]{"--png", "-y", "0"}},
+                    {new String[]{"--png", "-y", "-1"}},
             });
         }
 
         @Test(expected = ParseException.class)
         public void testParseInvalidParams() throws ParseException {
             // Exercise (and verify by exception)
-            Main.parseParams(this.args);
+            try {
+                Main.parseParams(this.args);
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+                throw e;
+            }
         }
     }
 
