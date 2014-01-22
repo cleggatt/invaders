@@ -11,14 +11,13 @@ import java.io.IOException;
 import java.util.Random;
 
 public final class Main {
-
-    // @VisibleForTesting
+    // VisibleForTesting
     static final int DEFAULT_X = 4;
     private static final String DEFAULT_X_STR = String.valueOf(DEFAULT_X);
-    // @VisibleForTesting
+    // VisibleForTesting
     static final int DEFAULT_Y = 6;
     private static final String DEFAULT_Y_STR = String.valueOf(DEFAULT_Y);
-    // @VisibleForTesting
+    // VisibleForTesting
     static final int DEFAULT_BLUR = 3;
     private static final String DEFAULT_BLUR_STR = String.valueOf(DEFAULT_BLUR);
 
@@ -38,8 +37,8 @@ public final class Main {
 
         options.addOption("s", "scale", true, "scaling factor for a tile (default: 1)");
 
-        options.addOption("w", "width", true, "number of tiles wide (default: 1)");
-        options.addOption("h", "height", true, "number of tiles high (default: 1)");
+        options.addOption("tileX", true, "number of tiles to create along the X axis (default: 1)");
+        options.addOption("tileY", true, "number of tiles to create along the Y axis  (default: 1)");
 
         options.addOption("b", "border", true, "border width for a tile (default: 0)");
 
@@ -48,7 +47,7 @@ public final class Main {
         options.addOption("guassian", true, String.format("guassian blur radius (image only, default: %d)", DEFAULT_BLUR));
     }
 
-    // @VisibleForTesting
+    // VisibleForTesting
     static class Params {
         enum Format {
             Text, Image
@@ -58,8 +57,8 @@ public final class Main {
         private final int x;
         private final int y;
         private final int scale;
-        private final int numWide;
-        private final int numHigh;
+        private final int tileX;
+        private final int tileY;
         private final int border;
         private final Long seed;
         private final int blurRadius;
@@ -80,12 +79,12 @@ public final class Main {
             return scale;
         }
 
-        int getNumWide() {
-            return numWide;
+        int getTileX() {
+            return tileX;
         }
 
-        int getNumHigh() {
-            return numHigh;
+        int getTileY() {
+            return tileY;
         }
 
         int getBorder() {
@@ -100,13 +99,13 @@ public final class Main {
             return blurRadius;
         }
 
-        Params(Format format, int x, int y, int scale, int numWide, int numHigh, int border, Long seed, int blurRadius) {
+        Params(Format format, int x, int y, int scale, int tileX, int tileY, int border, Long seed, int blurRadius) {
             this.x = x;
             this.y = y;
             this.format = format;
             this.scale = scale;
-            this.numWide = numWide;
-            this.numHigh = numHigh;
+            this.tileX = tileX;
+            this.tileY = tileY;
             this.border = border;
             this.seed = seed;
             this.blurRadius = blurRadius;
@@ -127,7 +126,6 @@ public final class Main {
 
         private int getInt(char option, int min, String defaultValue) throws ParseException {
             return getIntArgument("-", String.valueOf(option), min, defaultValue);
-
         }
 
         private int getInt(String option,  int min, String defaultValue) throws ParseException {
@@ -166,7 +164,7 @@ public final class Main {
         }
     }
 
-    // @VisibleForTesting
+    // VisibleForTesting
     static Params parseParams(String[] args) throws ParseException {
 
         InvaderCommandLine cmd = new InvaderCommandLine(args);
@@ -178,8 +176,8 @@ public final class Main {
         int x = cmd.getInt('x', 1, DEFAULT_X_STR);
         int y = cmd.getInt('y', 1, DEFAULT_Y_STR);
         int scale = cmd.getInt('s', 1, "1");
-        int width = cmd.getInt('w', 1, "1");
-        int height = cmd.getInt('h', 1, "1");
+        int tileX = cmd.getInt("tileX", 1, "1");
+        int tileY = cmd.getInt("tileY", 1, "1");
         int border = cmd.getInt('b', 0, "0");
 
         if (x * y > 62) {
@@ -209,22 +207,22 @@ public final class Main {
             throw new ParseException(optErr("Option 'text' or option 'png' must be specified"));
         }
 
-        return new Params(fmt, x, y, scale, width, height, border, seed, blurRadius);
+        return new Params(fmt, x, y, scale, tileX, tileY, border, seed, blurRadius);
     }
 
-    static String optErr(String err) {
+    private static String optErr(String err) {
         return err(String.format("invalid option -- %s", err));
     }
 
-    static String argErr(String prefix, String opt, String arg) {
+    private static String argErr(String prefix, String opt, String arg) {
         return err(String.format("invalid argument '%s' for '%s%s'", arg, prefix, opt));
     }
 
-    static String err(String err) {
+    private static String err(String err) {
         return String.format("invaders: %s\nTry 'invaders --help' for more information.", err);
     }
 
-    // @VisibleForTesting
+    // VisibleForTesting
     static Random seed(Random random, Params params) {
         if (params.getSeed() != null) {
             random.setSeed(params.getSeed());
@@ -232,7 +230,7 @@ public final class Main {
         return random;
     }
 
-    static BufferedImage blur(BufferedImage src, int blurRadius) {
+    private static BufferedImage blur(BufferedImage src, int blurRadius) {
         BufferedImage dst = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         GaussianBlurFilter gaussianFilter = new GaussianBlurFilter(blurRadius);
         gaussianFilter.filter(src, dst);
@@ -257,10 +255,10 @@ public final class Main {
 
         switch (params.getFormat()) {
             case Text:
-                System.out.println(invader.getTextInvaders(params.getNumWide(), params.getNumWide(), params.getBorder()));
+                System.out.println(invader.getTextInvaders(params.getTileX(), params.getTileX(), params.getBorder()));
                 break;
             case Image:
-                final BufferedImage image = blur(invader.getImageInvaders(params.getNumWide(), params.getNumHigh(), params.getBorder()), params.getBlurRadius());
+                final BufferedImage image = blur(invader.getImageInvaders(params.getTileX(), params.getTileY(), params.getBorder()), params.getBlurRadius());
                 final File output = new File("invader.png");
                 try {
                     ImageIO.write(image, "PNG", output);

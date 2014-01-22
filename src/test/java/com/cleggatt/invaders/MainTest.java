@@ -33,23 +33,23 @@ public class MainTest {
         }
 
         @Parameterized.Parameters
-        public static Collection primeNumbers() {
+        public static Collection params() {
             return Arrays.asList(new Object[][]{
                     {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
 
                     {new String[]{"--text", "--border", "0"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null, 0)},
 
-                    {new String[]{"--text", "--height", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
-                    {new String[]{"--text", "--height", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 0, null, 0)},
+                    {new String[]{"--text", "-tileY", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "-tileY", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 0, null, 0)},
 
                     {new String[]{"--text", "--scale", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 0, null, 0)},
 
                     {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 11L, 0)},
 
-                    {new String[]{"--text", "--width", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
-                    {new String[]{"--text", "--width", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 0, null, 0)},
+                    {new String[]{"--text", "-tileX", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text", "-tileX", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 0, null, 0)},
 
                     {new String[]{"--text", "-x", "1"}, new Params(Format.Text, 1, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "-x", "2"}, new Params(Format.Text, 2, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
@@ -62,10 +62,10 @@ public class MainTest {
                     {new String[]{"--png", "--guassian", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 16)},
 
                     {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--height", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 0, null, DEFAULT_BLUR)},                  {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "-tileY", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 0, null, DEFAULT_BLUR)},                  {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "--seed", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, 19L, DEFAULT_BLUR)},
                     {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 0, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--width", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 0, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "-tileX", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "-x", "4"}, new Params(Format.Image, 4, DEFAULT_Y, 1, 1, 1, 0, null, DEFAULT_BLUR)},
                     {new String[]{"--png", "-y", "5"}, new Params(Format.Image, DEFAULT_X, 5, 1, 1, 1, 0, null, DEFAULT_BLUR)},
             });
@@ -81,8 +81,8 @@ public class MainTest {
             assertEquals(expected.getX(), params.getX());
             assertEquals(expected.getY(), params.getY());
             assertEquals(expected.getScale(), params.getScale());
-            assertEquals(expected.getNumWide(), params.getNumWide());
-            assertEquals(expected.getNumHigh(), params.getNumHigh());
+            assertEquals(expected.getTileX(), params.getTileX());
+            assertEquals(expected.getTileY(), params.getTileY());
             assertEquals(expected.getBorder(), params.getBorder());
             assertEquals(expected.getSeed(), params.getSeed());
             assertEquals(expected.getBlurRadius(), params.getBlurRadius());
@@ -99,41 +99,41 @@ public class MainTest {
         }
 
         @Parameterized.Parameters
-        public static Collection primeNumbers() {
+        public static Collection params() {
             return Arrays.asList(new Object[][]{
                     // Invalid options without output specified
                     {new String[]{}},
                     {new String[]{"-x"}},
                     {new String[]{"--border"}},
                     {new String[]{"--guassian"}},
-                    {new String[]{"--height"}},
+                    {new String[]{"-tileY"}},
                     {new String[]{"--scale"}},
                     {new String[]{"--seed"}},
-                    {new String[]{"--width"}},
+                    {new String[]{"-tileX"}},
                     {new String[]{"-x"}},
                     {new String[]{"-y"}},
                     {new String[]{"--border", "11"}},
                     {new String[]{"--guassian", "12"}},
-                    {new String[]{"--height", "13"}},
+                    {new String[]{"-tileY", "13"}},
                     {new String[]{"--scale", "14"}},
                     {new String[]{"--seed", "15"}},
-                    {new String[]{"--width", "16"}},
+                    {new String[]{"-tileX", "16"}},
                     {new String[]{"-x", "17"}},
                     {new String[]{"-y", "18"}},
                     //  Invalid arguments type
                     {new String[]{"--text", "--border", "a"}},
-                    {new String[]{"--text", "--height", "B"}},
+                    {new String[]{"--text", "-tileY", "B"}},
                     {new String[]{"--text", "--scale", "c"}},
                     {new String[]{"--text", "--seed", "D"}},
-                    {new String[]{"--text", "--width", "e"}},
+                    {new String[]{"--text", "-tileX", "e"}},
                     {new String[]{"--text", "-x", "f"}},
                     {new String[]{"--text", "-y", "G"}},
                     {new String[]{"--png", "--border", "h"}},
                     {new String[]{"--png", "--guassian", "I"}},
-                    {new String[]{"--png", "--height", "j"}},
+                    {new String[]{"--png", "--tileY", "j"}},
                     {new String[]{"--png", "--scale", "K"}},
                     {new String[]{"--png", "--seed", "l"}},
-                    {new String[]{"--png", "--width", "M"}},
+                    {new String[]{"--png", "-tileX", "M"}},
                     {new String[]{"--png", "-x", "n"}},
                     {new String[]{"--png", "-y", "P"}},
                     // Invalid option combinations
@@ -142,12 +142,12 @@ public class MainTest {
                     // Invalid option arguments values - use PNG as all options are valid for it
                     {new String[]{"--png", "--border", "-1"}},
                     {new String[]{"--png", "--guassian", "-1"}},
-                    {new String[]{"--png", "--height", "0"}},
-                    {new String[]{"--png", "--height", "-1"}},
+                    {new String[]{"--png", "-tileY", "0"}},
+                    {new String[]{"--png", "-tileY", "-1"}},
                     {new String[]{"--png", "--scale", "0"}},
                     {new String[]{"--png", "--scale", "-1"}},
-                    {new String[]{"--png", "--width", "0"}},
-                    {new String[]{"--png", "--width", "-1"}},
+                    {new String[]{"--png", "-tileX", "0"}},
+                    {new String[]{"--png", "-tileX", "-1"}},
                     {new String[]{"--png", "-x", "0"}},
                     {new String[]{"--png", "-x", "-1"}},
                     {new String[]{"--png", "-y", "0"}},
