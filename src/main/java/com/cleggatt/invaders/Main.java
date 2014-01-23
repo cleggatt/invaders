@@ -40,6 +40,9 @@ public final class Main {
         options.addOption("tileX", true, "number of tiles to create along the X axis (default: 1)");
         options.addOption("tileY", true, "number of tiles to create along the Y axis  (default: 1)");
 
+        options.addOption("pxWidth", true, "the width (in pixels) of the final image");
+        options.addOption("pxHeight", true, "the height (in pixels) of the final image");
+
         options.addOption("b", "border", true, "border width for a tile (default: 0)");
 
         options.addOption("seed", true, "random seed for tile generation");
@@ -128,7 +131,7 @@ public final class Main {
             return getIntArgument("-", String.valueOf(option), min, defaultValue);
         }
 
-        private int getInt(String option,  int min, String defaultValue) throws ParseException {
+        private int getInt(String option, int min, String defaultValue) throws ParseException {
             return getIntArgument("--", option, min, defaultValue);
         }
 
@@ -173,12 +176,11 @@ public final class Main {
             return null;
         }
 
+        // TODO Change defaults based on format
         int x = cmd.getInt('x', 1, DEFAULT_X_STR);
         int y = cmd.getInt('y', 1, DEFAULT_Y_STR);
         int scale = cmd.getInt('s', 1, "1");
-        int tileX = cmd.getInt("tileX", 1, "1");
-        int tileY = cmd.getInt("tileY", 1, "1");
-        int border = cmd.getInt('b', 0, "0");
+        int border = cmd.getInt('b', 0, "1");
 
         if (x * y > 62) {
             throw new ParseException(err("invalid arguments for '-x' and '-y'\nTheir products must be less than 63"));
@@ -187,6 +189,27 @@ public final class Main {
         Long seed = null;
         if (cmd.hasOption("seed")) {
             seed = cmd.getLong("seed");
+        }
+
+        int tileX = 1;
+        int tileY = 1;
+        if (cmd.hasOption("tileX") || cmd.hasOption("tileY")) {
+            if (cmd.hasOption("pxWidth") || cmd.hasOption("pxHeight")) {
+                throw new ParseException(optErr("Option 'pxWidth' or 'pxHeight' cannot be specified with option 'tileX' or 'tileY'"));
+            }
+           tileX = cmd.getInt("tileX", 1, "1");
+           tileY = cmd.getInt("tileY", 1, "1");
+        } else {
+            if (cmd.hasOption("pxWidth")) {
+                int pxWidth = cmd.getInt("pxWidth", 1, "1");
+                // TODO Complain the provided pxWidth is too low to draw a single tile
+                tileX = pxWidth / (((x + border) * 2) * scale);
+            }
+            if (cmd.hasOption("pxHeight")) {
+                int pxHeight = cmd.getInt("pxHeight", 1, "1");
+                // TODO Complain the provided pxHeight is too low to draw a single tile
+                tileY = pxHeight / ((y + (border * 2)) * scale);
+            }
         }
 
         Params.Format fmt;
@@ -258,7 +281,9 @@ public final class Main {
                 System.out.println(invader.getTextInvaders(params.getTileX(), params.getTileX(), params.getBorder()));
                 break;
             case Image:
+                // TODO Center image if the pixel count leaves a remainder
                 final BufferedImage image = blur(invader.getImageInvaders(params.getTileX(), params.getTileY(), params.getBorder()), params.getBlurRadius());
+                // TODO Parameterise output file
                 final File output = new File("invader.png");
                 try {
                     ImageIO.write(image, "PNG", output);
