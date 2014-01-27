@@ -36,7 +36,7 @@ public class MainTest {
         @Parameterized.Parameters
         public static Collection params() {
             return Arrays.asList(new Object[][]{
-                    {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
+                    {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
 
                     {new String[]{"--text", "--border", "0"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
                     {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null, 0)},
@@ -155,6 +155,10 @@ public class MainTest {
                     {new String[]{"--png", "--guassian", "-1"}},
                     {new String[]{"--png", "-tileY", "0"}},
                     {new String[]{"--png", "-tileY", "-1"}},
+                    {new String[]{"--text", "-pxWidth", "0"}},
+                    {new String[]{"--text", "-pxWidth", "-1"}},
+                    {new String[]{"--text", "-pxHeight", "0"}},
+                    {new String[]{"--text", "-pxHeight", "-1"}},
                     {new String[]{"--png", "--scale", "0"}},
                     {new String[]{"--png", "--scale", "-1"}},
                     {new String[]{"--png", "-tileX", "0"}},
