@@ -42,8 +42,8 @@ public final class Main {
         options.addOption("tileX", true, "number of tiles to create along the X axis (default: 1)");
         options.addOption("tileY", true, "number of tiles to create along the Y axis  (default: 1)");
 
-        options.addOption("pxWidth", true, "the width (in pixels) of the final image");
-        options.addOption("pxHeight", true, "the height (in pixels) of the final image");
+        options.addOption("pxWidth", true, "the width (in pixels) of the final output");
+        options.addOption("pxHeight", true, "the height (in pixels) of the final ouput");
 
         options.addOption("b", "border", true, "border width for a tile (default: 0)");
 
@@ -304,7 +304,7 @@ public final class Main {
                 System.out.println(invader.getTextInvaders(params.getTileX(), params.getTileX(), params.getBorder()));
                 break;
             case Image:
-                // TODO Center image if the pixel count leaves a remainder
+                // TODO Center the image if the pixel count leaves a remainder
                 final BufferedImage image = blur(invader.getImageInvaders(params.getTileX(), params.getTileY(), params.getBorder()), params.getBlurRadius());
                 // TODO Validate file details
                 final File output = new File(params.getOutputFile());
