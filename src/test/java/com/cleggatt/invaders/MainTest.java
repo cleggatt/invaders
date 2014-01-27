@@ -36,40 +36,41 @@ public class MainTest {
         @Parameterized.Parameters
         public static Collection params() {
             return Arrays.asList(new Object[][]{
-                    {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
+                    {new String[]{"--text"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0, null)},
 
-                    {new String[]{"--text", "--border", "0"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0)},
-                    {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null, 0)},
+                    {new String[]{"--text", "--border", "0"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 0, null, 0, null)},
+                    {new String[]{"--text", "--border", "8"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 8, null, 0, null)},
 
-                    {new String[]{"--text", "-tileY", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
-                    {new String[]{"--text", "-tileY", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 1, null, 0)},
+                    {new String[]{"--text", "-tileY", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0, null)},
+                    {new String[]{"--text", "-tileY", "9"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 9, 1, null, 0, null)},
 
-                    {new String[]{"--text", "--scale", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
-                    {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 1, null, 0)},
+                    {new String[]{"--text", "--scale", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0, null)},
+                    {new String[]{"--text", "--scale", "10"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 10, 1, 1, 1, null, 0, null)},
 
-                    {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, 11L, 0)},
+                    {new String[]{"--text", "--seed", "11"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, 11L, 0, null)},
 
-                    {new String[]{"--text", "-tileX", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
-                    {new String[]{"--text", "-tileX", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 1, null, 0)},
+                    {new String[]{"--text", "-tileX", "1"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0, null)},
+                    {new String[]{"--text", "-tileX", "12"}, new Params(Format.Text, DEFAULT_X, DEFAULT_Y, 1, 12, 1, 1, null, 0, null)},
 
-                    {new String[]{"--text", "-x", "1"}, new Params(Format.Text, 1, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
-                    {new String[]{"--text", "-x", "2"}, new Params(Format.Text, 2, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
+                    {new String[]{"--text", "-x", "1"}, new Params(Format.Text, 1, DEFAULT_Y, 1, 1, 1, 1, null, 0, null)},
+                    {new String[]{"--text", "-x", "2"}, new Params(Format.Text, 2, DEFAULT_Y, 1, 1, 1, 1, null, 0, null)},
 
-                    {new String[]{"--text", "-y", "1"}, new Params(Format.Text, DEFAULT_X, 1, 1, 1, 1, 1, null, 0)},
-                    {new String[]{"--text", "-y", "3"}, new Params(Format.Text, DEFAULT_X, 3, 1, 1, 1, 1, null, 0)},
+                    {new String[]{"--text", "-y", "1"}, new Params(Format.Text, DEFAULT_X, 1, 1, 1, 1, 1, null, 0, null)},
+                    {new String[]{"--text", "-y", "3"}, new Params(Format.Text, DEFAULT_X, 3, 1, 1, 1, 1, null, 0, null)},
 
-                    {new String[]{"--png"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--guassian", "0"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0)},
-                    {new String[]{"--png", "--guassian", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 16)},
+                    {new String[]{"--png"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "--guassian", "0"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 0, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "--guassian", "16"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, 16, DEFAULT_OUTPUT_STR)},
 
-                    {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "-tileY", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 1, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 1, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--seed", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, 19L, DEFAULT_BLUR)},
-                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 1, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "-tileX", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 1, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "-x", "4"}, new Params(Format.Image, 4, DEFAULT_Y, 1, 1, 1, 1, null, DEFAULT_BLUR)},
-                    {new String[]{"--png", "-y", "5"}, new Params(Format.Image, DEFAULT_X, 5, 1, 1, 1, 1, null, DEFAULT_BLUR)},
+                    {new String[]{"--png", "--border", "15"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 15, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "-tileY", "17"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 17, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "--seed", "19"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, 19L, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "--scale", "18"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 18, 1, 1, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "-tileX", "20"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 20, 1, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "-x", "4"}, new Params(Format.Image, 4, DEFAULT_Y, 1, 1, 1, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "-y", "5"}, new Params(Format.Image, DEFAULT_X, 5, 1, 1, 1, 1, null, DEFAULT_BLUR, DEFAULT_OUTPUT_STR)},
+                    {new String[]{"--png", "--output", "file.out"}, new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 1, 1, 1, 1, null, DEFAULT_BLUR, "file.out")},
             });
         }
 
@@ -88,6 +89,7 @@ public class MainTest {
             assertEquals(expected.getBorder(), params.getBorder());
             assertEquals(expected.getSeed(), params.getSeed());
             assertEquals(expected.getBlurRadius(), params.getBlurRadius());
+            assertEquals(expected.getOutputFile(), params.getOutputFile());
         }
     }
 
@@ -149,6 +151,7 @@ public class MainTest {
                     // Invalid option combinations
                     {new String[]{"--text", "--png"}},
                     {new String[]{"--text", "--guassian", "1"}},
+                    {new String[]{"--text", "--output", "file.out"}},
                     {new String[]{"--text", "-pxWidth", "100", "-pxHeight", "100", "-tileX", "10", "-tileY", "10", }},
                     // Invalid option arguments values - use PNG as all options are valid for it
                     {new String[]{"--png", "--border", "-1"}},
@@ -167,6 +170,9 @@ public class MainTest {
                     {new String[]{"--png", "-x", "-1"}},
                     {new String[]{"--png", "-y", "0"}},
                     {new String[]{"--png", "-y", "-1"}},
+                    // Result in 0 tiles
+                    {new String[]{"--png", "-pxWidth", "1", "-x", "1"}},
+                    {new String[]{"--png", "-pxHeight", "1", "-y", "2"}},
             });
         }
 
@@ -246,7 +252,7 @@ public class MainTest {
             // Set up
             Random random = mock(Random.class);
             // Exercise
-            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 0, 0, 0, 0, 42L, 0);
+            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y, 0, 0, 0, 0, 42L, 0, null);
             Main.seed(random, params);
             // Verify
             verify(random).setSeed(42L);
@@ -257,7 +263,7 @@ public class MainTest {
             // Set up
             Random random = mock(Random.class);
             // Exercise
-            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y,0, 0, 0, 0, null, 0);
+            Params params = new Params(Format.Image, DEFAULT_X, DEFAULT_Y,0, 0, 0, 0, null, 0, null);
             Main.seed(random, params);
             // Verify
             verify(random, never()).setSeed(anyLong());

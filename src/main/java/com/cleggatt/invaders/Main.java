@@ -20,6 +20,8 @@ public final class Main {
     // VisibleForTesting
     static final int DEFAULT_BLUR = 3;
     private static final String DEFAULT_BLUR_STR = String.valueOf(DEFAULT_BLUR);
+    // VisibleForTesting
+    static final String DEFAULT_OUTPUT_STR = "invader.png";
 
     private Main() {
     }
@@ -48,6 +50,8 @@ public final class Main {
         options.addOption("seed", true, "random seed for tile generation");
 
         options.addOption("guassian", true, String.format("guassian blur radius (image only, default: %d)", DEFAULT_BLUR));
+
+        options.addOption("o", "output", true, String.format("output file name (image only, default: %s)", DEFAULT_OUTPUT_STR));
     }
 
     // VisibleForTesting
@@ -65,6 +69,7 @@ public final class Main {
         private final int border;
         private final Long seed;
         private final int blurRadius;
+        private final String outputFile;
 
         Format getFormat() {
             return format;
@@ -102,7 +107,11 @@ public final class Main {
             return blurRadius;
         }
 
-        Params(Format format, int x, int y, int scale, int tileX, int tileY, int border, Long seed, int blurRadius) {
+        public String getOutputFile() {
+            return outputFile;
+        }
+
+        Params(Format format, int x, int y, int scale, int tileX, int tileY, int border, Long seed, int blurRadius, String outputFile) {
             this.x = x;
             this.y = y;
             this.format = format;
@@ -112,6 +121,7 @@ public final class Main {
             this.border = border;
             this.seed = seed;
             this.blurRadius = blurRadius;
+            this.outputFile = outputFile;
         }
     }
 
@@ -158,6 +168,10 @@ public final class Main {
             }
         }
 
+        public String getString(String option, String defaultValue) {
+            return cmd.getOptionValue(option, defaultValue);
+        }
+
         private boolean hasOption(char opt) {
             return cmd.hasOption(opt);
         }
@@ -165,6 +179,7 @@ public final class Main {
         private boolean hasOption(String opt) {
             return cmd.hasOption(opt);
         }
+
     }
 
     // VisibleForTesting
@@ -176,7 +191,6 @@ public final class Main {
             return null;
         }
 
-        // TODO Change defaults based on format
         int x = cmd.getInt('x', 1, DEFAULT_X_STR);
         int y = cmd.getInt('y', 1, DEFAULT_Y_STR);
         int scale = cmd.getInt('s', 1, "1");
@@ -202,18 +216,23 @@ public final class Main {
         } else {
             if (cmd.hasOption("pxWidth")) {
                 int pxWidth = cmd.getInt("pxWidth", 1, "1");
-                // TODO Complain the provided pxWidth is too low to draw a single tile
                 tileX = pxWidth / (((x + border) * 2) * scale);
+                if (tileX < 1) {
+                    throw new ParseException(optErr("Option 'pxWidth' must be wide enough for at least 1 tile"));
+                }
             }
             if (cmd.hasOption("pxHeight")) {
                 int pxHeight = cmd.getInt("pxHeight", 1, "1");
-                // TODO Complain the provided pxHeight is too low to draw a single tile
                 tileY = pxHeight / ((y + (border * 2)) * scale);
+                if (tileY < 1) {
+                    throw new ParseException(optErr("Option 'pxHeight' must be high enough for at least 1 tile"));
+                }
             }
         }
 
         Params.Format fmt;
         int blurRadius = 0;
+        String output = null;
 
         if (cmd.hasOption('t')) {
             if (cmd.hasOption('p')) {
@@ -222,15 +241,19 @@ public final class Main {
             if (cmd.hasOption("guassian")) {
                 throw new ParseException(optErr("Option 'guassian' cannot be specified with option 'text'"));
             }
+            if (cmd.hasOption("output")) {
+                throw new ParseException(optErr("Option 'output' cannot be specified with option 'text'"));
+            }
             fmt = Params.Format.Text;
         } else if (cmd.hasOption('p')) {
             fmt = Params.Format.Image;
             blurRadius = cmd.getInt("guassian", 0, DEFAULT_BLUR_STR);
+            output = cmd.getString("output", DEFAULT_OUTPUT_STR);
         } else {
             throw new ParseException(optErr("Option 'text' or option 'png' must be specified"));
         }
 
-        return new Params(fmt, x, y, scale, tileX, tileY, border, seed, blurRadius);
+        return new Params(fmt, x, y, scale, tileX, tileY, border, seed, blurRadius, output);
     }
 
     private static String optErr(String err) {
@@ -283,8 +306,8 @@ public final class Main {
             case Image:
                 // TODO Center image if the pixel count leaves a remainder
                 final BufferedImage image = blur(invader.getImageInvaders(params.getTileX(), params.getTileY(), params.getBorder()), params.getBlurRadius());
-                // TODO Parameterise output file
-                final File output = new File("invader.png");
+                // TODO Validate file details
+                final File output = new File(params.getOutputFile());
                 try {
                     ImageIO.write(image, "PNG", output);
                     System.out.print(String.format("Saved to %s\n", output.getAbsolutePath()));
