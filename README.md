@@ -9,7 +9,8 @@ Invaders can be produced as text (on stdout), or as a PNG image (to a file).
 Usage
 -----
 
-`java -jar invaders-1.0-standalone.jar [-b <arg>] [-guassian <arg>] [-help] [-o <arg>] [-p] [-pxHeight <arg>] [-pxWidth <arg>] [-s <arg>] [-seed <arg>] [-t] [-tileX <arg>] [-tileY <arg>] [-x <arg>] [-y <arg>]`
+`java -jar invaders-1.0-standalone.jar [-b <arg>] [-guassian <arg>] [-help] [-o <arg>] [-p] [-pxHeight <arg>]
+	[-pxWidth <arg>] [-s <arg>] [-seed <arg>] [-t] [-tileX <arg>] [-tileY <arg>] [-x <arg>] [-y <arg>]`
 
 ### Basic options
 
