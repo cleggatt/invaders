@@ -5,6 +5,8 @@ import org.apache.commons.cli.*;
 import org.jdesktop.swingx.image.GaussianBlurFilter;
 
 import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -67,6 +69,8 @@ public final class Main {
         private final int tileX;
         private final int tileY;
         private final int border;
+        private final int pxWidth;
+        private final int pxHeight;
         private final Long seed;
         private final int blurRadius;
         private final String outputFile;
@@ -99,6 +103,10 @@ public final class Main {
             return border;
         }
 
+        int getPxWidth() {  return pxWidth; }
+
+        int getPxHeight() { return pxHeight; }
+
         Long getSeed() {
             return seed;
         }
@@ -111,7 +119,8 @@ public final class Main {
             return outputFile;
         }
 
-        Params(Format format, int x, int y, int scale, int tileX, int tileY, int border, Long seed, int blurRadius, String outputFile) {
+        // TODO We have too many parameters - switch to a builder
+        Params(Format format, int x, int y, int scale, int tileX, int tileY, int border, int pxWidth, int pxHeight, Long seed, int blurRadius, String outputFile) {
             this.x = x;
             this.y = y;
             this.format = format;
@@ -119,6 +128,8 @@ public final class Main {
             this.tileX = tileX;
             this.tileY = tileY;
             this.border = border;
+            this.pxWidth = pxWidth;
+            this.pxHeight = pxHeight;
             this.seed = seed;
             this.blurRadius = blurRadius;
             this.outputFile = outputFile;
@@ -207,6 +218,8 @@ public final class Main {
 
         int tileX = 1;
         int tileY = 1;
+        int pxWidth = -1;
+        int pxHeight = -1;
         if (cmd.hasOption("tileX") || cmd.hasOption("tileY")) {
             if (cmd.hasOption("pxWidth") || cmd.hasOption("pxHeight")) {
                 throw new ParseException(optErr("Option 'pxWidth' or 'pxHeight' cannot be specified with option 'tileX' or 'tileY'"));
@@ -215,15 +228,17 @@ public final class Main {
            tileY = cmd.getInt("tileY", 1, "1");
         } else {
             if (cmd.hasOption("pxWidth")) {
-                int pxWidth = cmd.getInt("pxWidth", 1, "1");
-                tileX = pxWidth / (((x + border) * 2) * scale);
+                pxWidth = cmd.getInt("pxWidth", 1, "1");
+                int tileWidth = ((x + border) * 2) * scale;
+                tileX = pxWidth / tileWidth;
                 if (tileX < 1) {
                     throw new ParseException(optErr("Option 'pxWidth' must be wide enough for at least 1 tile"));
                 }
             }
             if (cmd.hasOption("pxHeight")) {
-                int pxHeight = cmd.getInt("pxHeight", 1, "1");
-                tileY = pxHeight / ((y + (border * 2)) * scale);
+                pxHeight = cmd.getInt("pxHeight", 1, "1");
+                int tileHeight = (y + (border * 2)) * scale;
+                tileY = pxHeight / tileHeight;
                 if (tileY < 1) {
                     throw new ParseException(optErr("Option 'pxHeight' must be high enough for at least 1 tile"));
                 }
@@ -253,7 +268,16 @@ public final class Main {
             throw new ParseException(optErr("Option 'text' or option 'png' must be specified"));
         }
 
-        return new Params(fmt, x, y, scale, tileX, tileY, border, seed, blurRadius, output);
+        return new Params(fmt, x, y, scale, tileX, tileY, border, pxWidth, pxHeight, seed, blurRadius, output);
+    }
+
+    static int roundUp(int value, int divisor) {
+        long longValue = value;
+        long longDivisor = divisor;
+        long longResult = (longValue + longDivisor - 1) / longDivisor;
+
+        // The result will never be larger than value, which is an int
+        return (int) longResult;
     }
 
     private static String optErr(String err) {
@@ -274,6 +298,17 @@ public final class Main {
             random.setSeed(params.getSeed());
         }
         return random;
+    }
+
+    private static BufferedImage offset(BufferedImage src, int pxDesiredWidth, int pxDesiredHeight) {
+        BufferedImage dst = new BufferedImage(pxDesiredWidth, pxDesiredHeight, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D graphics = dst.createGraphics();
+        graphics.setPaint(Color.black);
+        graphics.fillRect(0, 0, dst.getWidth(), dst.getHeight());
+        graphics.drawImage(src, null, (pxDesiredWidth - src.getWidth()) / 2, (pxDesiredHeight - src.getHeight()) / 2);
+
+        return dst;
     }
 
     private static BufferedImage blur(BufferedImage src, int blurRadius) {
@@ -304,13 +339,11 @@ public final class Main {
                 System.out.println(invader.getTextInvaders(params.getTileX(), params.getTileX(), params.getBorder()));
                 break;
             case Image:
-                // TODO Center the image if the pixel count leaves a remainder
-                final BufferedImage image = blur(invader.getImageInvaders(params.getTileX(), params.getTileY(), params.getBorder()), params.getBlurRadius());
-                // TODO Validate file details
+                final BufferedImage image = blur(offset(invader.getImageInvaders(params.getTileX(), params.getTileY(), params.getBorder()), params.getPxWidth(), params.getPxHeight()), params.getBlurRadius());
                 final File output = new File(params.getOutputFile());
                 try {
                     ImageIO.write(image, "PNG", output);
-                    System.out.print(String.format("Saved to %s\n", output.getAbsolutePath()));
+                    System.out.print(String.format("Saved %d x %d to %s\n", image.getWidth(), image.getHeight(), output.getAbsolutePath()));
                 } catch (IOException e) {
                     e.printStackTrace();
                     System.exit(1);
